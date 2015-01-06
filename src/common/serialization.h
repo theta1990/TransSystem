@@ -1,0 +1,157 @@
+/*
+ * serialization.h
+ *
+ *  Created on: Dec 13, 2014
+ *      Author: volt
+ */
+
+#ifndef SERIALIZATION_H_
+#define SERIALIZATION_H_
+#include "../common.h"
+
+namespace expdb {
+/**
+ * encode methods here, using little endian, small bytes on the small position
+ *
+ * Now provide
+ * 	int8
+ * 	int16
+ * 	int32
+ * 	int64
+ *
+ * 	In future, we need to add timestamp
+ */
+inline int encode_i8(char *buf, const int64_t buf_len, int64_t &pos,
+		int8_t val) {
+
+	int ret =
+			((NULL != buf)
+					&& (buf_len - pos >= static_cast<int64_t>(sizeof(val)))) ?
+					SUCCESS : ERROR;
+
+	if (SUCCESS == ret) {
+		*(buf + pos++) = val;
+	}
+	return ret;
+}
+
+inline int decode_i8(const char *buf, const int64_t buf_len, int64_t &pos,
+		int8_t *val) {
+
+	int ret = (NULL != buf && buf_len - pos >= 1) ? SUCCESS : ERROR;
+	if (SUCCESS == ret) {
+		*val = *(buf + pos++);
+	}
+	return ret;
+}
+
+inline int encode_i16(char * buf, const int64_t buf_len, int64_t& pos,
+		int16_t val) {
+	int ret =
+			((NULL != buf)
+					&& ((buf_len - pos) >= static_cast<int64_t>(sizeof(val)))) ?
+					SUCCESS : ERROR;
+	if (SUCCESS == ret) {
+		*(buf + pos++) = static_cast<char>((((val) >> 8)) & 0xff);
+		*(buf + pos++) = static_cast<char>((val) & 0xff);
+	}
+	return ret;
+}
+
+inline int decode_i16(const char * buf, const int64_t data_len, int64_t& pos,
+		int16_t* val) {
+	int ret = (NULL != buf && data_len - pos >= 2) ? SUCCESS : ERROR;
+	if (SUCCESS == ret) {
+		*val = static_cast<int16_t>(((*(buf + pos++)) & 0xff) << 8);
+		*val = static_cast<int16_t>(*val | (*(buf + pos++) & 0xff));
+	}
+	return ret;
+}
+
+inline int encode_i32(char *buf, const int64_t buf_len, int64_t& pos,
+		int32_t val) {
+	int ret =
+			((NULL != buf)
+					&& ((buf_len - pos) >= static_cast<int64_t>(sizeof(val)))) ?
+					SUCCESS : ERROR;
+	if (SUCCESS == ret) {
+		*(buf + pos++) = static_cast<char>(((val) >> 24) & 0xff);
+		*(buf + pos++) = static_cast<char>(((val) >> 16) & 0xff);
+		*(buf + pos++) = static_cast<char>(((val) >> 8) & 0xff);
+		*(buf + pos++) = static_cast<char>((val) & 0xff);
+	}
+	return ret;
+}
+
+inline int decode_i32(const char * buf, const int64_t data_len, int64_t& pos,
+		int32_t* val) {
+
+	int ret = (NULL != buf && data_len - pos >= 4) ? SUCCESS : ERROR;
+	if (SUCCESS == ret) {
+		*val = ((static_cast<int32_t>(*(buf + pos++))) & 0xff) << 24;
+		*val |= ((static_cast<int32_t>(*(buf + pos++))) & 0xff) << 16;
+		*val |= ((static_cast<int32_t>(*(buf + pos++))) & 0xff) << 8;
+		*val |= ((static_cast<int32_t>(*(buf + pos++))) & 0xff);
+	}
+	return ret;
+}
+
+inline int encode_i64(char *buf, const int64_t buf_len, int64_t& pos,
+		int64_t val) {
+	int ret =
+			((NULL != buf)
+					&& ((buf_len - pos) >= static_cast<int64_t>(sizeof(val)))) ?
+					SUCCESS : ERROR;
+	if (SUCCESS == ret) {
+		*(buf + pos++) = static_cast<char>(((val) >> 56) & 0xff);
+		*(buf + pos++) = static_cast<char>(((val) >> 48) & 0xff);
+		*(buf + pos++) = static_cast<char>(((val) >> 40) & 0xff);
+		*(buf + pos++) = static_cast<char>(((val) >> 32) & 0xff);
+		*(buf + pos++) = static_cast<char>(((val) >> 24) & 0xff);
+		*(buf + pos++) = static_cast<char>(((val) >> 16) & 0xff);
+		*(buf + pos++) = static_cast<char>(((val) >> 8) & 0xff);
+		*(buf + pos++) = static_cast<char>((val) & 0xff);
+	}
+	return ret;
+}
+
+inline int decode_i64(const char * buf, const int64_t data_len, int64_t& pos,
+		int64_t* val) {
+	int ret = (NULL != buf && data_len - pos >= 8) ? SUCCESS : ERROR;
+	if (SUCCESS == ret) {
+		*val = ((static_cast<int64_t>((*(buf + pos++))) & 0xff)) << 56;
+		*val |= ((static_cast<int64_t>((*(buf + pos++))) & 0xff)) << 48;
+		*val |= ((static_cast<int64_t>((*(buf + pos++))) & 0xff)) << 40;
+		*val |= ((static_cast<int64_t>((*(buf + pos++))) & 0xff)) << 32;
+		*val |= ((static_cast<int64_t>((*(buf + pos++))) & 0xff)) << 24;
+		*val |= ((static_cast<int64_t>((*(buf + pos++))) & 0xff)) << 16;
+		*val |= ((static_cast<int64_t>((*(buf + pos++))) & 0xff)) << 8;
+		*val |= ((static_cast<int64_t>((*(buf + pos++))) & 0xff));
+	}
+	return ret;
+}
+
+inline int encode_bool(char *buf, const int64_t buf_len, int64_t& pos,
+		bool val) {
+	int ret =
+			((NULL != buf)
+					&& ((buf_len - pos) >= static_cast<int64_t>(sizeof(val)))) ?
+					SUCCESS : ERROR;
+	if (SUCCESS == ret)
+		*(buf + pos++) = (val) ? 1 : 0;
+	return ret;
+}
+
+inline int decode_bool(const char *buf, const int64_t buf_len, int64_t& pos,
+		bool *val) {
+	int ret = ERROR;
+	int8_t v = 0;
+	if ((ret = decode_i8(buf, buf_len, pos, &v)) == 0) {
+		*val = (v != 0);
+	}
+	return ret;
+}
+
+}
+
+#endif /* SERIALIZATION_H_ */
