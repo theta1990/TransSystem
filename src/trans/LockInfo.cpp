@@ -48,6 +48,7 @@ int32_t RCLockInfo::writeBegin(RowValue*& value) {
 		VOLT_DEBUG("lock failed");
 	}else {
 		m_cbTasks.push_back(CallbackTask(value));
+		m_undoTasks.push_back(UndoTask(value));
 	}
 
 	return ret;

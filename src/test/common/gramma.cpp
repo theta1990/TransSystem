@@ -73,4 +73,4 @@ int grammaTest(int argc, char **argv){
 //	pthread_join(h2, NULL);
 	return 0;
 }
-TEST(grammaTest);
+//TEST(grammaTest);

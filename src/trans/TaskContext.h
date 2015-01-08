@@ -45,6 +45,9 @@ public:
 			return ERROR;
 		}
 	}
+
+	int32_t addUndoTask(const RowDesc *desc, const RowValue *rowValue);
+
 	int32_t handleLockFailure();
 	int32_t rollback();
 
@@ -62,6 +65,7 @@ private:
 //	Datum			data;		//数据，什么数据呢？延迟写的时候可能会用到的数据
 //	Log				logs;		//日志，
 //	Dependency		dep;		//提交依赖，如果采用投机执行之后会需要用到
+	std::vector<UndoTask> m_undoTask;
 	LockInfo* m_lock;
 	int32_t m_transId;
 	bool	m_rollback;

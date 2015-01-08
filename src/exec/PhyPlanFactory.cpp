@@ -19,6 +19,7 @@ PhyPlanFactory * PhyPlanFactory::getInstance(){
 	if( NULL == ins_ ){
 
 		ins_ = new PhyPlanFactory();
+		ins_->m_alloc.init(0);
 	}
 	return ins_;
 }

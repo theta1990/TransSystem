@@ -11,6 +11,7 @@
 #include <vector>
 #include "../common.h"
 #include "QLock.h"
+#include "UndoTask.h"
 namespace expdb {
 
 struct RowValue {
@@ -49,6 +50,7 @@ public:
 private:
 
 	std::vector<CallbackTask> &m_cbTasks;
+	std::vector<UndoTask> 	&m_undoTasks;
 };
 
 /**
@@ -64,7 +66,7 @@ public:
 
 	virtual int32_t callback() {
 
-		if (m_value->m_lock.unlock())
+		if ( SUCCESS == m_value->m_lock.unlock())
 			return SUCCESS;
 		else
 			return ERROR;

@@ -32,9 +32,7 @@ public:
 	virtual ~TransExecQueue();
 private:
 	boost::lockfree::queue<TransTask> m_queue;
-//	std::queue<TransTask> m_queue;
 	boost::atomic<bool> m_done;
-//	LockMgr *m_lockMgr;
 	StatCollector m_stat;
 
 	Allocator	m_alloc;

@@ -49,7 +49,7 @@ int32_t UpdateExecutor::open() {
 					if( plan == NULL ){
 						VOLT_WARN("phyical plan is not set");
 						ret = ERROR;
-					}else if( (ctx = plan->getTaskContext()) != NULL ){
+					}else if( (ctx = plan->getTaskContext()) == NULL ){
 						VOLT_WARN("context is not set");
 						ret = ERROR;
 					}else if( SUCCESS != (ret = m_table->update(*ctx, key, m_exp)) ){

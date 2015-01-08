@@ -84,7 +84,6 @@ int32_t RowTable::insert(TaskContext& ctx, const Row *row) {
 			}else {
 				VOLT_DEBUG("insert into index failed, unknow");
 			}
-
 		}
 	}
 	return ret;
