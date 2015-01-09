@@ -12,13 +12,8 @@
 #include "../common.h"
 #include "QLock.h"
 #include "UndoTask.h"
+#include "../storage/RowTable.h"
 namespace expdb {
-
-struct RowValue {
-
-	QLock m_lock;
-	char m_value[0];
-};
 
 class CallbackTask;
 
@@ -50,7 +45,7 @@ public:
 private:
 
 	std::vector<CallbackTask> &m_cbTasks;
-	std::vector<UndoTask> 	&m_undoTasks;
+//	std::vector<UndoTask> 	&m_undoTasks;
 };
 
 /**

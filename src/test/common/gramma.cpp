@@ -60,9 +60,13 @@ int grammaTest(int argc, char **argv){
 //
 //	printf("%d", *ref);
 
-	int *a = new int;
-	*a = 10;
-	int b = 10;
+//	int *a = new int;
+//	*a = 10;
+//	int b = 10;
+
+	int a = 1;
+	printf("%x", ~a);
+
 //	testRef(&b);
 
 //	pthread_t h1, h2;

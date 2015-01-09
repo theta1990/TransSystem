@@ -19,12 +19,30 @@ namespace expdb {
 
 typedef RowObj RowKey;
 
-struct RowValue;
+struct RowValue {
+
+	QLock m_lock;
+	int8_t m_flag;
+	char m_value[0];
+
+	bool isDelete() const{
+
+		return m_flag & 1 == 1;
+	}
+
+	void setDeleted() {
+
+		m_flag = m_flag | 1;
+	}
+
+};
+
 
 template class HashIndex<RowKey, RowValue *>;
 
 class TaskContext;
 class LockInfo;
+
 
 class RowTable {
 public:

@@ -9,7 +9,8 @@
 #include "../trans/TaskContext.h"
 namespace expdb {
 
-RowTable::RowTable() : m_priIndex(), m_desc(NULL), m_alloc(){
+RowTable::RowTable() :
+		m_priIndex(), m_desc(NULL), m_alloc() {
 	// TODO Auto-generated constructor stub
 	m_priIndex.init(0xffff);
 }
@@ -26,11 +27,12 @@ int32_t RowTable::insert(RowKey key, const Row& row) {
 	int32_t ret = SUCCESS;
 	RowValue *ptr;
 //	row.seriliaze(ptr);
-	if( (ptr = (RowValue *)m_alloc.alloc(sizeof(QLock) + m_desc->getRowLen())) != NULL ){
-		if( SUCCESS == (set(ptr, row)) ) {
-			ret = insert(key ,ptr);
+	if ((ptr = (RowValue *) m_alloc.alloc(sizeof(QLock) + m_desc->getRowLen()))
+			!= NULL) {
+		if (SUCCESS == (set(ptr, row))) {
+			ret = insert(key, ptr);
 		}
-	}else {
+	} else {
 		ret = ERROR;
 	}
 	return ret;
@@ -52,42 +54,98 @@ int32_t RowTable::insert(RowKey key, RowValue* ptr) {
 	return ret;
 }
 
-int32_t RowTable::insert(TaskContext& ctx, const Row *row) {
+//refactor
+int32_t RowTable::insert(TaskContext &ctx, const Row *row) {
 
 	int32_t ret = SUCCESS;
+
 	RowKey key;
-	RowValue* value = NULL;
-	LockInfo *lock = NULL;	//todo
+	RowValue *value;
 
-	if( SUCCESS != ctx.getLockInfo(lock) ) {
+	LockInfo *lock = NULL;
+	if (SUCCESS != (ret = row->getRowKey(key))) {
+		VOLT_WARN("Primary key is not provided");
+	} else if (SUCCESS != (ret = m_priIndex.find(key, value))) {
 
-		VOLT_ERROR("get lock failed");
-		ret = ERROR;
-	}else {
-
-		if( SUCCESS != (ret = row->getRowKey(key)) ) {
-
-			VOLT_DEBUG("get row key failed");
-		}else if(NULL == (value = (RowValue *)m_alloc.alloc(sizeof(QLock) + m_desc->getRowLen()))){		//bug here, alloc method get incorrect memory for the rowvalue
-
-			VOLT_DEBUG(("alloc memory for row failed"));
-		}else if(SUCCESS != (set(value, row))){
-
-			VOLT_DEBUG("create row value failed");
-		}else if( SUCCESS != (ret = lock->writeBegin(value))){		//hold the lock of the value, avoid modify by other trans
-
-			VOLT_DEBUG("acquire lock failed");
-		}else if( SUCCESS != (ret = m_priIndex.insert(key, value))){
-
-			if( DUPKEY == ret ) {
-				VOLT_INFO("insert into index failed, dup key");
-			}else {
-				VOLT_DEBUG("insert into index failed, unknow");
+		if (NOTFOUND == ret) {
+			if ( NULL
+					== (value = (RowValue *) m_alloc.alloc(
+							sizeof(QLock) + sizeof(int8_t)
+									+ m_desc->getRowLen()))) {
+				VOLT_WARN("Memory is not enough");
+				ret = ERROR;
+			} else {
+				value->setDeleted();
+				if (SUCCESS != (ret = m_priIndex.insert(key, value))) {
+					VOLT_WARN("Insert failure");
+				}
 			}
+		}
+	}
+
+	if (SUCCESS == ret) {
+
+		if (SUCCESS != (ret = ctx.getLockInfo(lock))) {
+			VOLT_ERROR("Context does not has lock info");
+		} else if (SUCCESS != (ret = lock->writeBegin(value))) {
+			VOLT_WARN("lock failure");
+			//post process here;
+		} else if (!value->isDelete()) {
+
+			ret = DUPKEY;
+			VOLT_ERROR("Insert failure, primary key already exists");
+		} else if (SUCCESS != (ret = set(value, row))) {
+
+			VOLT_WARN("modify row failure");
 		}
 	}
 	return ret;
 }
+
+//int32_t RowTable::insert(TaskContext& ctx, const Row *row) {
+//
+//	int32_t ret = SUCCESS;
+//	RowKey key;
+//	RowValue* value = NULL;
+//	LockInfo *lock = NULL;	//todo
+//
+//	if (SUCCESS != ctx.getLockInfo(lock)) {
+//
+//		VOLT_ERROR("get lock failed");
+//		ret = ERROR;
+//	} else {
+//
+//		if (SUCCESS != (ret = row->getRowKey(key))) {
+//
+//			VOLT_DEBUG("get row key failed");
+//		} else if (m_priIndex.find(key, value) == SUCCESS
+//				&& !value->isDelete()) {
+//
+//			VOLT_TRACE("find a delete version in the index tree");
+//		} else if (NULL
+//				== (value = (RowValue *) m_alloc.alloc(
+//						sizeof(QLock) + m_desc->getRowLen()))) {//bug here, alloc method get incorrect memory for the rowvalue
+//
+//			VOLT_DEBUG(("alloc memory for row failed"));
+//		}
+//
+//		if (SUCCESS != (set(value, row))) {
+//
+//			VOLT_DEBUG("create row value failed");
+//		} else if (SUCCESS != (ret = lock->writeBegin(value))) {//hold the lock of the value, avoid modify by other trans
+//
+//			VOLT_DEBUG("acquire lock failed");
+//		} else if (SUCCESS != (ret = m_priIndex.insert(key, value))) {
+//
+//			if (DUPKEY == ret) {
+//				VOLT_INFO("insert into index failed, dup key");
+//			} else {
+//				VOLT_DEBUG("insert into index failed, unknow");
+//			}
+//		}
+//	}
+//	return ret;
+//}
 
 int32_t RowTable::update(RowKey key, const Row& ptr) {
 
@@ -106,20 +164,22 @@ int32_t RowTable::update(TaskContext& ctx, RowKey key, Expression *expr) {
 	int32_t ret = SUCCESS;
 	LockInfo *lockinfo = NULL;
 	RowValue *value = NULL;
-	if( SUCCESS != ctx.getLockInfo(lockinfo) ){
+	if (SUCCESS != ctx.getLockInfo(lockinfo)) {
 		VOLT_ERROR("get lock info failed");
-	}else if( SUCCESS != m_priIndex.find(key, value) ){	//how to ensure the primary index tree won't be modified, tree should be locked.
-		VOLT_DEBUG("row does not existed");
+	} else if (SUCCESS != m_priIndex.find(key, value)) { //how to ensure the primary index tree won't be modified, tree should be locked.
+		VOLT_WARN("row does not existed");
 		ret = NOT_EXIST;
-	}else if( SUCCESS != lockinfo->writeBegin(value) ){
-		VOLT_DEBUG("lock failed");
+	} else if (SUCCESS != lockinfo->writeBegin(value)) {
+		VOLT_WARN("lock failed");
 		//ctx.handleLockFailure();	//important for the concurrency control
-	}else {
+	} else {
 
 		Row oldRow(m_desc);
 		const Row *newRow;
 		int64_t pos = 0;
-		if( SUCCESS == oldRow.deserilization(value->m_value, m_desc->getRowLen(), pos) ){
+		if (SUCCESS
+				== oldRow.deserilization(value->m_value, m_desc->getRowLen(),
+						pos)) {
 			expr->cal(&oldRow, newRow);
 			set(value, newRow);
 		}
@@ -127,7 +187,6 @@ int32_t RowTable::update(TaskContext& ctx, RowKey key, Expression *expr) {
 	}
 	return ret;
 }
-
 
 int RowTable::setDesc(const RowDesc *desc) {
 
@@ -149,12 +208,12 @@ int32_t RowTable::get(const RowKey key, Row& ref) {
 
 	int32_t ret = SUCCESS;
 	RowValue *value = NULL;
-	if(  ERROR == (ret = m_priIndex.find(key, value)) ){
+	if (ERROR == (ret = m_priIndex.find(key, value))) {
 		VOLT_ERROR("Primary Index error");
-	}else if( NOTFOUND == ret ){
-
-
-	}else {
+	} else if (NOTFOUND == ret) {
+		VOLT_WARN("Row not found");
+		key.dump();
+	} else {
 		int64_t pos = 0;
 		ref.setDesc(m_desc);
 		ref.deserilization(value->m_value, m_desc->getRowLen(), pos);
@@ -170,16 +229,17 @@ int32_t RowTable::set(RowValue* value, const Row& row) {
 	int32_t ret = SUCCESS;
 	int64_t pos = 0;
 	ret = row.serilization(value->m_value, m_desc->getRowLen(), pos);
+	value->m_flag = value->m_flag & (~1);
 	assert(pos == m_desc->getRowLen());
 	return ret;
 }
-
 
 int32_t RowTable::set(RowValue* value, const Row* row) {
 
 	int32_t ret = SUCCESS;
 	int64_t pos = 0;
 	ret = row->serilization(value->m_value, m_desc->getRowLen(), pos);
+	value->m_flag = value->m_flag & (~1);
 	assert(pos == m_desc->getRowLen());
 	return ret;
 }
