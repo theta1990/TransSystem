@@ -12,7 +12,8 @@ namespace expdb {
 TaskContextMgr* TaskContextMgr::ins_ = NULL;
 
 TaskContext::TaskContext() :
-		m_cbTaskList(), m_lock(NULL), m_transId(0), m_rollback(false) {
+		m_cbTaskList(), m_undoTaskList(), m_lock(NULL), m_logger(NULL), m_transId(
+				0), m_rollback(false) {
 	// TODO Auto-generated constructor stub
 }
 
@@ -45,7 +46,7 @@ int32_t TaskContext::rollback() {
 /**
  * possible, we can get all the lock here
  */
-int32_t TaskContext::startProcess(){
+int32_t TaskContext::startProcess() {
 
 	m_rollback = false;
 	m_cbTaskList.clear();
@@ -67,7 +68,6 @@ int32_t TaskContext::postProcess() {
 	return ret;
 }
 
-
 TaskContextMgr * TaskContextMgr::getInstance() {
 
 	if (ins_ == NULL) {
@@ -82,12 +82,16 @@ int32_t TaskContextMgr::newContext(int32_t tid, TaskContext*& ctx,
 	int32_t ret = SUCCESS;
 
 	LockInfo *lock;
+	Logger *logger;
 	void *p = alloc.alloc(sizeof(TaskContext));
 	void *plock = alloc.alloc(sizeof(RCLockInfo));
+	void *plogger = alloc.alloc(sizeof(Logger));
 	ctx = new (p) TaskContext();
 	lock = new (plock) RCLockInfo(ctx->m_cbTaskList);
+	logger = new (plogger) Logger(ctx->m_undoTaskList);
 
 	ctx->setLockInfo(lock);
+	ctx->setLogger(logger);
 
 	return ret;
 }
@@ -98,7 +102,8 @@ int32_t TaskContextMgr::releaseContext(TaskContext *ctx, Allocator& alloc) {
 
 	LockInfo *info = NULL;
 	ctx->getLockInfo(info);
-	if( NULL != info ) alloc.free(info);
+	if ( NULL != info)
+		alloc.free(info);
 	alloc.free(ctx);
 	return ret;
 }

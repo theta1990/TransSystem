@@ -11,7 +11,6 @@
 #include <vector>
 #include "../common.h"
 #include "QLock.h"
-#include "UndoTask.h"
 #include "../storage/RowTable.h"
 namespace expdb {
 
@@ -45,7 +44,6 @@ public:
 private:
 
 	std::vector<CallbackTask> &m_cbTasks;
-//	std::vector<UndoTask> 	&m_undoTasks;
 };
 
 /**

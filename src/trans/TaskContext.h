@@ -11,6 +11,7 @@
 #include "LockInfo.h"
 #include "../exec/PhyPlan.h"
 #include "../common/memory/Allocator.h"
+#include "UndoTask.h"
 #include <map>
 namespace expdb {
 
@@ -46,7 +47,20 @@ public:
 		}
 	}
 
-	int32_t addUndoTask(const RowDesc *desc, const RowValue *rowValue);
+	int32_t setLogger(Logger *logger) {
+		m_logger = logger;
+		return SUCCESS;
+	}
+
+	int32_t getLogger(Logger *&logger) {
+
+		if ( NULL != m_logger) {
+			logger = m_logger;
+			return SUCCESS;
+		} else {
+			return ERROR;
+		}
+	}
 
 	int32_t handleLockFailure();
 	int32_t rollback();
@@ -63,12 +77,12 @@ private:
 
 	std::vector<CallbackTask> m_cbTaskList;		//解锁任务
 //	Datum			data;		//数据，什么数据呢？延迟写的时候可能会用到的数据
-//	Log				logs;		//日志，
 //	Dependency		dep;		//提交依赖，如果采用投机执行之后会需要用到
-	std::vector<UndoTask> m_undoTask;
+	std::vector<UndoTask> m_undoTaskList;
 	LockInfo* m_lock;
+	Logger* m_logger;
 	int32_t m_transId;
-	bool	m_rollback;
+	bool m_rollback;
 	int32_t m_retCode;
 };
 
