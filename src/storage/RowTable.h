@@ -27,7 +27,7 @@ struct RowValue {
 
 	bool isDelete() const{
 
-		return m_flag & 1 == 1;
+		return (m_flag & 1) == 1;
 	}
 
 	void setDeleted() {

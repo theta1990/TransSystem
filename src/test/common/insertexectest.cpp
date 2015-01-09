@@ -24,7 +24,7 @@ int rowStreamGen(char *buf, int64_t size, int64_t &pos,
 	RowKey key;
 	SchemaMgr::getInstance()->getTableDesc("hw", desc);
 	Row row(desc);
-	int count = 100;
+	int count = 10;
 	while (count--) {
 		rowGen(row);
 		row.getRowKey(key);

@@ -63,6 +63,7 @@ int32_t RowTable::insert(TaskContext &ctx, const Row *row) {
 	RowValue *value;
 
 	LockInfo *lock = NULL;
+	Logger *logger = NULL;
 	if (SUCCESS != (ret = row->getRowKey(key))) {
 		VOLT_WARN("Primary key is not provided");
 	} else if (SUCCESS != (ret = m_priIndex.find(key, value))) {
@@ -90,12 +91,16 @@ int32_t RowTable::insert(TaskContext &ctx, const Row *row) {
 		} else if (SUCCESS != (ret = lock->writeBegin(value))) {
 			VOLT_WARN("lock failure");
 			//post process here;
+			//not here, the caller handle the lock failure
 		} else if (!value->isDelete()) {
 
 			ret = DUPKEY;
 			VOLT_ERROR("Insert failure, primary key already exists");
+		} else if (SUCCESS != (ret = ctx.getLogger(logger))) {
+			VOLT_ERROR("Context does not has undo logger");
+		} else if (SUCCESS != (ret = logger->undo(m_desc, value))) {
+			VOLT_ERROR("Logger undo failed");
 		} else if (SUCCESS != (ret = set(value, row))) {
-
 			VOLT_WARN("modify row failure");
 		}
 	}
@@ -163,27 +168,34 @@ int32_t RowTable::update(TaskContext& ctx, RowKey key, Expression *expr) {
 
 	int32_t ret = SUCCESS;
 	LockInfo *lockinfo = NULL;
+	Logger *logger = NULL;
 	RowValue *value = NULL;
 	if (SUCCESS != ctx.getLockInfo(lockinfo)) {
 		VOLT_ERROR("get lock info failed");
-	} else if (SUCCESS != m_priIndex.find(key, value)) { //how to ensure the primary index tree won't be modified, tree should be locked.
+		ret = ERROR;
+	} else if (SUCCESS != m_priIndex.find(key, value) || value->isDelete()) { //how to ensure the primary index tree won't be modified, tree should be locked.
 		VOLT_WARN("row does not existed");
 		ret = NOT_EXIST;
 	} else if (SUCCESS != lockinfo->writeBegin(value)) {
 		VOLT_WARN("lock failed");
-		//ctx.handleLockFailure();	//important for the concurrency control
+		ret = LOCK_NOT_FREE;
 	} else {
 
-		Row oldRow(m_desc);
-		const Row *newRow;
-		int64_t pos = 0;
-		if (SUCCESS
-				== oldRow.deserilization(value->m_value, m_desc->getRowLen(),
-						pos)) {
-			expr->cal(&oldRow, newRow);
-			set(value, newRow);
+		if (SUCCESS != (ret = ctx.getLogger(logger))) {
+			VOLT_ERROR("Context does not has undo logger");
+		} else if (SUCCESS != (ret = logger->undo(m_desc, value))) {
+			VOLT_ERROR("Logger undo failed");
+		} else {
+			Row oldRow(m_desc);
+			const Row *newRow;
+			int64_t pos = 0;
+			if (SUCCESS
+					== oldRow.deserilization(value->m_value,
+							m_desc->getRowLen(), pos)) {
+				expr->cal(&oldRow, newRow);
+				set(value, newRow);
+			}
 		}
-//		set(value, row);		//修改取值
 	}
 	return ret;
 }
@@ -210,9 +222,10 @@ int32_t RowTable::get(const RowKey key, Row& ref) {
 	RowValue *value = NULL;
 	if (ERROR == (ret = m_priIndex.find(key, value))) {
 		VOLT_ERROR("Primary Index error");
-	} else if (NOTFOUND == ret) {
+	} else if (NOTFOUND == ret || value->isDelete()) {
 		VOLT_WARN("Row not found");
-		key.dump();
+		ret = NOTFOUND;
+//		key.dump();
 	} else {
 		int64_t pos = 0;
 		ref.setDesc(m_desc);

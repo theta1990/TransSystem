@@ -35,11 +35,17 @@ int32_t TaskContext::rollback() {
 	int32_t ret = SUCCESS;
 	m_rollback = true;
 
-	for (uint32_t i = 0; i < m_cbTaskList.size(); ++i) {
-		if (SUCCESS != m_cbTaskList[i].callback()) {
-			VOLT_DEBUG("roll back, unlock failed");
+	for(uint32_t i = 0;i<m_undoTaskList.size();++i){
+		if( SUCCESS != m_undoTaskList[i].undo()) {
+			VOLT_ERROR("ops, undo failure, what is impossible!!");
 		}
 	}
+
+//	for (uint32_t i = 0; i < m_cbTaskList.size(); ++i) {
+//		if (SUCCESS != m_cbTaskList[i].callback()) {
+//			VOLT_DEBUG("roll back, unlock failed");
+//		}
+//	}
 	return ret;
 }
 
