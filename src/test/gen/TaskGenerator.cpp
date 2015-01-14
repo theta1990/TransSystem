@@ -1,6 +1,9 @@
 #include "../../exec/PhyPlanFactory.h"
 #include "../../trans/MyServer.h"
 #include "../common/test.h"
+#include "../../storage/TableMgr.h"
+#include "../../storage/SchemaMgr.h"
+#include "../../common/serialization.h"
 using namespace expdb;
 
 /**
@@ -12,6 +15,10 @@ void createAccountTable() {
 	int32_t id;
 	desc.addRowType(SMALLINT);
 	desc.addRowType(MIDINT);
+	int32_t priIdx[8];
+
+	priIdx[0] = 0;
+	desc.setPriIdx(priIdx, 1);
 
 	if (SUCCESS != SchemaMgr::getInstance()->addTable("account", &desc)) {
 
@@ -67,6 +74,19 @@ void genAddAccountTask(TransTask &task, char *inputValues, int32_t sz) {
 	task.addPhyPlan(plan);
 }
 
+void genAddAccouttask(TransTask &task, uint16_t id, uint32_t money){
+
+	PhyPlan *plan;
+	RowTable *table;
+	TableMgr::getInstance()->getTable(0, table);
+
+	std::vector<RowObj> objList;
+	objList.push_back(RowObj(id));
+	objList.push_back(RowObj(money));
+	PhyPlanFactory::getInstance()->genInsertPlan(plan, objList,table);
+	task.addPhyPlan(plan);
+}
+
 
 void genTransferTask(TransTask &task, uint16_t id1, uint16_t id2, uint32_t money) {
 
@@ -78,31 +98,36 @@ void genTransferTask(TransTask &task, uint16_t id1, uint16_t id2, uint32_t money
 
 	Expression expr1(1, MIN);
 	RowObj obj1;
+	RowKey key1;
 	obj1.setMidInt(money);
 	expr1.setArg(obj1);
 
 	obj1.setSmallInt(id1);
-	PhyPlanFactory::getInstance()->genUpdatePlan(sourcePlan, obj1, expr1,
+	PhyPlanFactory::getInstance()->genUpdatePlan(sourcePlan, key1, expr1,
 			account);
 
 
 	RowObj obj2;
+	RowKey key2;
 	Expression expr2(1, ADD);
 	obj2.setMidInt(money);
 	expr2.setArg(obj2);
 
 	obj2.setSmallInt(id2);
-	PhyPlanFactory::getInstance()->genUpdatePlan(destPlan, obj2, expr2, account);
+	PhyPlanFactory::getInstance()->genUpdatePlan(destPlan, key2, expr2, account);
 
 
+	std::vector<RowObj> objList;
+	objList.push_back(RowObj(id1));
+	objList.push_back(RowObj(id2));
+	objList.push_back(RowObj(money));
+	PhyPlanFactory::getInstance()->genInsertPlan(recordPlan, objList, record);
 
-	PhyPlanFactory::getInstance()->genInsertPlan();
-
+	task.addPhyPlan(sourcePlan);
+	task.addPhyPlan(destPlan);
+	task.addPhyPlan(recordPlan);
 }
 
-void *generateThread(void *para) {
-
-}
 
 int startGenerator(int argc, char **argv) {
 

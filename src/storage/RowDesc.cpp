@@ -9,7 +9,7 @@
 #include "RowObj.h"
 namespace expdb {
 
-RowDesc::RowDesc() : m_priIdx(0), m_colCnt(0) {
+RowDesc::RowDesc() : m_colCnt(0) {
 	// TODO Auto-generated constructor stub
 
 }

@@ -10,10 +10,37 @@
 #include "../common.h"
 #include "RowObj.h"
 #include "RowDesc.h"
-
+#include "../common/murmur_hash.h"
 namespace expdb {
 
-typedef RowObj RowKey;
+struct RowKey{
+
+	int8_t m_size;
+	RowObj m_keys[8];
+
+
+	uint64_t hash() const {
+
+		uint64_t hv[8], ret;
+		for (int8_t i = 0; i < m_size; ++i) {
+			hv[i] = m_keys[i].hash();
+		}
+		ret = tools::murmurhash64A(hv, sizeof(uint64_t) * m_size, 0);
+		return ret;
+	}
+
+	bool operator ==(const RowKey &obj) const {
+
+		bool ret = (m_size == obj.m_size);
+		if (ret) {
+			for (int8_t i = 0; i < m_size && ret; ++i) {
+				ret = (m_keys[i] == obj.m_keys[i]);
+			}
+		}
+		return ret;
+	}
+
+};
 
 class Row {
 public:

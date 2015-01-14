@@ -24,7 +24,7 @@ int32_t UpdateExecutor::open() {
 
 	int ret = SUCCESS;
 
-	if ( NULL == m_childop || NULL == m_table ) {
+	if ( NULL == m_childop || NULL == m_table) {
 		VOLT_INFO("update executor is not set properly");
 		ret = ERROR;
 	} else if (SUCCESS != (ret = m_childop->open())) {
@@ -38,23 +38,18 @@ int32_t UpdateExecutor::open() {
 //				m_exp->cal(m_curRow, m_curRow);	//calculate the update version
 				RowKey key;
 				m_curRow->getRowKey(key);
-				if ( NULL == m_exp) {
 
-					VOLT_DEBUG("update expression is not set");
-					break;
-				} else {
-
-					PhyPlan* plan = getPhyPlan();
-					TaskContext* ctx;
-					if( plan == NULL ){
-						VOLT_WARN("phyical plan is not set");
-						ret = ERROR;
-					}else if( (ctx = plan->getTaskContext()) == NULL ){
-						VOLT_WARN("context is not set");
-						ret = ERROR;
-					}else if( SUCCESS != (ret = m_table->update(*ctx, key, &m_exp)) ){
-						VOLT_WARN("update fail");
-					}
+				PhyPlan* plan = getPhyPlan();
+				TaskContext* ctx;
+				if (plan == NULL) {
+					VOLT_WARN("phyical plan is not set");
+					ret = ERROR;
+				} else if ((ctx = plan->getTaskContext()) == NULL) {
+					VOLT_WARN("context is not set");
+					ret = ERROR;
+				} else if (SUCCESS
+						!= (ret = m_table->update(*ctx, key, &m_exp))) {
+					VOLT_WARN("update fail");
 				}
 			} else {
 				break;

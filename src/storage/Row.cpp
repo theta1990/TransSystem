@@ -189,10 +189,15 @@ int Row::deserilization(const char* buf, const int64_t buf_len, int64_t& pos) {
 int32_t Row::getRowKey(RowKey& key) const {
 
 	assert(m_desc != NULL);
-	uint32_t priIdx = m_desc->getPriIdx();
-	assert(priIdx < m_desc->getColCnt());
+	const int32_t * priIdx = m_desc->getPriIdx();
 
-	key = m_col[priIdx];
+	int8_t &i = key.m_size;
+	i = 0;
+	while( priIdx[i] != -1 && i < 8 ) {
+
+		key.m_keys[i] = m_col[priIdx[i]];
+		++i;
+	}
 	return SUCCESS;
 }
 

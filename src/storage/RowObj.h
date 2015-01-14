@@ -34,6 +34,13 @@ class Row;
 class RowObj {
 public:
 	RowObj();
+
+	RowObj(uint16_t si);
+	RowObj(uint32_t mi);
+	RowObj(uint64_t bi);
+	RowObj(char ch);
+	RowObj(bool bo);
+
 	virtual ~RowObj();
 	uint64_t hash() const;
 
@@ -196,8 +203,6 @@ bool RowObj::getbool() {
 	return m_value.bvalue;
 }
 
-
-typedef RowObj RowKey;
 } /* namespace expdb */
 
 #endif /* ROWOBJ_H_ */

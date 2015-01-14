@@ -17,8 +17,6 @@
 #include "../exec/Expression.h"
 namespace expdb {
 
-typedef RowObj RowKey;
-
 struct RowValue {
 
 	QLock m_lock;

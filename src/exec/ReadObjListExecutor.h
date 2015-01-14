@@ -23,10 +23,19 @@ public:
 
 	virtual int32_t reset();
 
-	virtual int32_t setRowDesc(const RowDesc *);
+	virtual int32_t setDesc(const RowDesc *);
 	virtual int32_t addObjList(RowObj *list, int32_t size);
 	virtual int32_t addObjList(std::vector<RowObj> list);
 	virtual int32_t addObj(RowObj obj);
+
+	virtual ExecType getType(){
+
+		return READOBJLIST;
+	}
+
+	virtual Executor *getChild() {
+		return NULL;
+	}
 
 	virtual ~ReadObjListExecutor();
 

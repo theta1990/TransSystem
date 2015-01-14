@@ -27,9 +27,35 @@ RowObj::Assign 		RowObj::assifunc;
 
 RowObj::RowObj() :
 		m_type(SMALLINT) {
-	// TODO Auto-generated constructor stub
 
 }
+
+RowObj::RowObj(uint16_t si) :
+		m_type(SMALLINT) {
+
+	m_value.smallint = si;
+}
+
+RowObj::RowObj(uint32_t mi) :
+		m_type(MIDINT) {
+	m_value.midint = mi;
+}
+
+RowObj::RowObj(uint64_t bi) :
+		m_type(BIGINT) {
+	m_value.bigint = bi;
+}
+
+RowObj::RowObj(char ch) :
+		m_type(CHAR) {
+	m_value.cvalue = ch;
+}
+
+RowObj::RowObj(bool bo) :
+		m_type(BVALUE) {
+	m_value.bvalue = bo;
+}
+
 
 RowObj::~RowObj() {
 	// TODO Auto-generated destructor stub

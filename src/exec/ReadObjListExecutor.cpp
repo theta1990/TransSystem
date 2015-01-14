@@ -65,7 +65,7 @@ int32_t ReadObjListExecutor::reset() {
 	return SUCCESS;
 }
 
-int32_t ReadObjListExecutor::setRowDesc(const RowDesc *desc) {
+int32_t ReadObjListExecutor::setDesc(const RowDesc *desc) {
 
 	m_desc = desc;
 	return SUCCESS;

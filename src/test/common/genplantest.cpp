@@ -66,7 +66,7 @@ int genPlanTest(int argc, char **argv) {
 	expr.setArg(arg);
 
 	TaskContextMgr::getInstance()->newContext(2, ctx, alloc);
-	PhyPlanFactory::getInstance()->genUpdatePlan(plan, buf, pos, &expr, &table);
+	PhyPlanFactory::getInstance()->genUpdatePlan(plan, buf, pos, expr, &table);
 
 	plan->setContext(ctx);
 	plan->setContext(ctx);

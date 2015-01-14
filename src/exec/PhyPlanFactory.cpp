@@ -10,6 +10,8 @@
 #include "InsertExecutor.h"
 #include "UpdateExecutor.h"
 #include "GetExecutor.h"
+#include "IndexScanExecutor.h"
+#include "ReadObjListExecutor.h"
 #include "../storage/TableMgr.h"
 namespace expdb {
 
@@ -71,6 +73,34 @@ int32_t PhyPlanFactory::genInsertPlan(PhyPlan *&plan, char *inputValues,
 	plan->m_query = insertExec;
 
 	readExec->setPhyPlan(plan);
+	insertExec->setPhyPlan(plan);
+
+	return ret;
+}
+
+int32_t PhyPlanFactory::genInsertPlan(PhyPlan *&plan,
+		std::vector<RowObj> objList, RowTable *table) {
+
+	int32_t ret = SUCCESS;
+
+	void *p = m_alloc.alloc(sizeof(ReadObjListExecutor));
+	ReadObjListExecutor *readObjListExecutor = new (p) ReadObjListExecutor();
+	const RowDesc *desc;
+	table->getDesc(desc);
+	readObjListExecutor->setDesc(desc);
+	readObjListExecutor->addObjList(objList);
+
+	p = m_alloc.alloc(sizeof(InsertExecutor));
+	InsertExecutor *insertExec = new (p) InsertExecutor();
+
+	insertExec->setTable(table);
+	insertExec->addChild(readObjListExecutor);
+
+	p = m_alloc.alloc(sizeof(PhyPlan));
+	plan = new (p) PhyPlan();
+	plan->m_query = insertExec;
+
+	readObjListExecutor->setPhyPlan(plan);
 	insertExec->setPhyPlan(plan);
 
 	return ret;
@@ -177,40 +207,55 @@ int32_t PhyPlanFactory::genInsertPlan(PhyPlan*& plan, char* inputValues,
 		int32_t sz, int32_t tableId) {
 
 	RowTable *table = NULL;
-	if( TableMgr::getInstance()->getTable(tableId, table) == SUCCESS ) {
+	if (TableMgr::getInstance()->getTable(tableId, table) == SUCCESS) {
 		genInsertPlan(plan, inputValues, sz, table);
 		return SUCCESS;
-	}else return ERROR;
+	} else
+		return ERROR;
+}
+
+int32_t PhyPlanFactory::genInsertPlan(PhyPlan*& plan,
+		std::vector<RowObj> objList, int32_t tableId) {
+
+	RowTable *table = NULL;
+	if (TableMgr::getInstance()->getTable(tableId, table) == SUCCESS) {
+		genInsertPlan(plan, objList, table);
+		return SUCCESS;
+	} else
+		return ERROR;
 }
 
 int32_t PhyPlanFactory::genSelectPlan(PhyPlan*& plan, char* inputVaules,
 		int32_t sz, int32_t tableId) {
 
 	RowTable *table = NULL;
-	if( TableMgr::getInstance()->getTable(tableId, table) == SUCCESS ){
+	if (TableMgr::getInstance()->getTable(tableId, table) == SUCCESS) {
 		genSelectPlan(plan, inputVaules, sz, table);
 		return SUCCESS;
-	}else return ERROR;
+	} else
+		return ERROR;
 }
 
 int32_t PhyPlanFactory::genUpdatePlan(PhyPlan*& plan, char* inputValues,
 		int32_t sz, Expression expr, int32_t tableId) {
 
 	RowTable *table = NULL;
-	if( TableMgr::getInstance()->getTable(tableId, table) == SUCCESS ){
+	if (TableMgr::getInstance()->getTable(tableId, table) == SUCCESS) {
 		genUpdatePlan(plan, inputValues, sz, expr, table);
 		return SUCCESS;
-	}else return ERROR;
+	} else
+		return ERROR;
 }
 
 int32_t PhyPlanFactory::genUpdatePlan(PhyPlan *&plan, RowKey key,
 		Expression expr, int32_t tableId) {
 
 	RowTable *table = NULL;
-	if( TableMgr::getInstance()->getTable(tableId, table) == SUCCESS ){
+	if (TableMgr::getInstance()->getTable(tableId, table) == SUCCESS) {
 		genUpdatePlan(plan, key, expr, table);
 		return SUCCESS;
-	}else return ERROR;
+	} else
+		return ERROR;
 }
 
 int32_t PhyPlanFactory::genDeletePlan() {
