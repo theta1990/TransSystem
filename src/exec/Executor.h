@@ -20,7 +20,8 @@ enum ExecType{
 	DELETE,
 	READ,
 	READER,
-	GET
+	GET,
+	INDEXSCAN,
 };
 
 /***

@@ -53,7 +53,10 @@ public:
 		return m_planlist[m_pro++];
 	}
 
-	int32_t addPhyPlan(PhyPlan *plan);
+	int32_t addPhyPlan(PhyPlan *plan) {
+		m_planlist[m_size++] = plan;
+		return SUCCESS;
+	}
 	int32_t setTranId(uint32_t tranId);
 
 	void destroy();

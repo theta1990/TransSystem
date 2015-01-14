@@ -10,7 +10,7 @@
 namespace expdb {
 
 UpdateExecutor::UpdateExecutor() :
-		m_childop(NULL), m_curRow(NULL), m_exp(NULL), m_table(NULL) {
+		m_childop(NULL), m_curRow(NULL), m_exp(), m_table(NULL) {
 
 }
 
@@ -52,7 +52,7 @@ int32_t UpdateExecutor::open() {
 					}else if( (ctx = plan->getTaskContext()) == NULL ){
 						VOLT_WARN("context is not set");
 						ret = ERROR;
-					}else if( SUCCESS != (ret = m_table->update(*ctx, key, m_exp)) ){
+					}else if( SUCCESS != (ret = m_table->update(*ctx, key, &m_exp)) ){
 						VOLT_WARN("update fail");
 					}
 				}

@@ -47,6 +47,11 @@ public:
 	inline uint64_t getBigInt();
 	inline char getChar();
 	inline bool getbool();
+
+	RowType getType() const{
+		return m_type;
+	}
+
 	bool operator >(const RowObj &obj) const;
 	bool operator ==(const RowObj &obj) const;
 

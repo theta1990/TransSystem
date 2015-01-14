@@ -23,10 +23,6 @@ public:
 
 	int32_t virtual reset();
 
-	virtual int32_t setContext(TaskContext *ctx){
-		return SUCCESS;
-	}
-
 	int32_t setInput(char *str, int64_t len){
 		m_str = str;
 		m_len = len;
@@ -49,7 +45,7 @@ public:
 		return NULL;
 	}
 private:
-	char*		m_str;
+	char*		m_str;		//这个字段的内存怎么回收呢？
 	int64_t 	m_len;
 	int64_t		m_pos;
 	const RowDesc 	*m_desc;

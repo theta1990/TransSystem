@@ -32,6 +32,9 @@ int32_t MyServer::startServer() {
 	return ret;
 }
 
+/**
+ * 这个函数可以考虑让多个线程同时调用，其作用就是让多个线程同时往队列中添加任务
+ */
 int32_t MyServer::handleTask(TransTask task) {
 
 	int32_t ret = SUCCESS;

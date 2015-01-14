@@ -28,8 +28,14 @@ public:
 
 	int32_t genInsertPlan(PhyPlan *&plan, char *inputValues, int32_t sz, RowTable *table);
 	int32_t genSelectPlan(PhyPlan *&plan, char *inputVaules, int32_t sz, RowTable *table);
-	int32_t genUpdatePlan(PhyPlan *&plan, char *inputValues, int32_t sz ,Expression *expr, RowTable *table);	//逻辑计划上的update内部应该是会包含这些参数信息的
+	int32_t genUpdatePlan(PhyPlan *&plan, char *inputValues, int32_t sz ,Expression expr, RowTable *table);	//逻辑计划上的update内部应该是会包含这些参数信息的
+	int32_t genUpdatePlan(PhyPlan *&plan, RowKey key, Expression expr, RowTable * table);
 	int32_t genDeletePlan();
+
+	int32_t genInsertPlan(PhyPlan *&plan, char *inputValues, int32_t sz, int32_t tableId);
+	int32_t genSelectPlan(PhyPlan *&plan, char *inputVaules, int32_t sz, int32_t tableId);
+	int32_t genUpdatePlan(PhyPlan *&plan, char *inputValues, int32_t sz ,Expression expr, int32_t tableId);	//逻辑计划上的update内部应该是会包含这些参数信息的
+	int32_t genUpdatePlan(PhyPlan *&plan, RowKey key, Expression expr, int32_t tableId);
 
 private:
 	PhyPlanFactory();

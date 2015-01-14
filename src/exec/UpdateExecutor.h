@@ -31,7 +31,7 @@ public:
 		m_table = table;
 		return SUCCESS;
 	}
-	int32_t setExpr(Expression* exp){
+	int32_t setExpr(Expression exp){
 		m_exp = exp;
 		return SUCCESS;
 	}
@@ -48,7 +48,7 @@ public:
 private:
 	Executor	*m_childop;
 	const Row 	*m_curRow;	//记录当前访问到的行
-	Expression 	*m_exp;		//表达更新操作的逻辑含义，应该要输入一个行，然后计算出一个新的行出来。
+	Expression 	m_exp;		//表达更新操作的逻辑含义，应该要输入一个行，然后计算出一个新的行出来。
 	RowTable	*m_table;
 };
 } /* namespace expdb */
