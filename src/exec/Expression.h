@@ -17,6 +17,10 @@ class Expression {
 public:
 	Expression();
 	Expression(int32_t colId, OpType type);
+	Expression(const Expression &expr);
+
+	const Expression & operator = (const Expression& expr);
+
 	int32_t setArg(RowObj arg);
 	int32_t setType(OpType type);
 	int32_t cal(const Row *in, const Row *&out);	//输入一个行，计算出一个新的行返回

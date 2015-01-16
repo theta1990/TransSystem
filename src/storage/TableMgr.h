@@ -26,10 +26,14 @@ private:
 	TableMgr();
 
 	static TableMgr *ins__;
+	static const int8_t	maxTableNum = 16;
+	RowTable *	m_tableList[maxTableNum];
+	int8_t		m_flag[maxTableNum];
+//	std::vector<RowTable *> m_tableList;
+//	std::vector<int8_t> 	m_flags;
+//	volatile uint32_t		m_Count;
+	QLock					m_lock;
 
-	std::vector<RowTable *> m_tableList;
-	std::vector<int8_t> 	m_flags;
-	volatile uint32_t		m_Count;
 };
 
 } /* namespace expdb */

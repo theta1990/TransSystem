@@ -14,8 +14,7 @@ namespace expdb {
 
 TransExecQueue::TransExecQueue() :
 		m_queue(128), m_done(false), m_stat() {
-	// TODO Auto-generated constructor stub
-
+	m_alloc.init(0);
 }
 
 int TransExecQueue::push(TransTask task) {
@@ -90,6 +89,7 @@ int TransExecQueue::handleTask(TransTask& task) {
 				if (SUCCESS != rc) {
 					ctx->rollback();
 					break;
+				}else {
 				}
 			}
 		}
@@ -98,6 +98,7 @@ int TransExecQueue::handleTask(TransTask& task) {
 
 		if( SUCCESS == ctx->getRetCode() ) {//transaction successfully processed
 
+			VOLT_INFO("Successfully handle trans %d", task.getTranId());
 			task.destroy();
 		}else {	//re-process the transaction
 

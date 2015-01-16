@@ -59,6 +59,11 @@ public:
 	}
 	int32_t setTranId(uint32_t tranId);
 
+	void clear(){
+		m_size = 0;
+		m_pro = 0;
+	}
+
 	void destroy();
 
 	friend class TransTaskFactory;

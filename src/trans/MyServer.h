@@ -11,7 +11,7 @@
 namespace expdb {
 
 #define MaxWorkerThread 8
-#define DefaultWorkerThread 4
+#define DefaultWorkerThread 1
 class MyServer {
 public:
 	MyServer();
@@ -20,6 +20,7 @@ public:
 	int32_t startServer();
 	int32_t handleTask(TransTask task);
 private:
+
 	TransExecQueue*	m_threadPools[MaxWorkerThread];
 	int32_t			m_count;
 	Allocator		m_alloc;

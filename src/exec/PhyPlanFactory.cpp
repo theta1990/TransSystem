@@ -55,26 +55,48 @@ int32_t PhyPlanFactory::genInsertPlan(PhyPlan *&plan, char *inputValues,
 
 	int32_t ret = SUCCESS;
 
-	void *p = m_alloc.alloc(sizeof(ReadExecutor));
-	ReadExecutor *readExec = new (p) ReadExecutor();
+	ReadExecutor *readExec;
+	InsertExecutor *insertExec;
 	const RowDesc *desc;
-	table->getDesc(desc);
-	readExec->setDesc(desc);
-	readExec->setInput(inputValues, sz);
+	void *p = m_alloc.alloc(sizeof(ReadExecutor));
+	if ( NULL == p) {
+		VOLT_WARN("Memory is not enough");
+		ret = ERROR;
+	} else {
 
-	p = m_alloc.alloc(sizeof(InsertExecutor));
-	InsertExecutor *insertExec = new (p) InsertExecutor();
+		readExec = new (p) ReadExecutor();
+		table->getDesc(desc);
+		readExec->setDesc(desc);
+		readExec->setInput(inputValues, sz);
+	}
 
-	insertExec->setTable(table);
-	insertExec->addChild(readExec);
+	if (SUCCESS == ret) {
+		p = m_alloc.alloc(sizeof(InsertExecutor));
 
-	p = m_alloc.alloc(sizeof(PhyPlan));
-	plan = new (p) PhyPlan();
-	plan->m_query = insertExec;
+		if ( NULL == p) {
+			VOLT_WARN("Memory is not engouth");
+			ret = ERROR;
+		} else {
+			insertExec = new (p) InsertExecutor();
+			insertExec->setTable(table);
+			insertExec->addChild(readExec);
+		}
+	}
 
-	readExec->setPhyPlan(plan);
-	insertExec->setPhyPlan(plan);
+	if (SUCCESS == ret) {
+		p = m_alloc.alloc(sizeof(PhyPlan));
 
+		if ( NULL == p) {
+			VOLT_WARN("Memory is not enough");
+			ret = ERROR;
+		} else {
+			plan = new (p) PhyPlan();
+			plan->m_query = insertExec;
+
+			readExec->setPhyPlan(plan);
+			insertExec->setPhyPlan(plan);
+		}
+	}
 	return ret;
 }
 
@@ -83,26 +105,48 @@ int32_t PhyPlanFactory::genInsertPlan(PhyPlan *&plan,
 
 	int32_t ret = SUCCESS;
 
-	void *p = m_alloc.alloc(sizeof(ReadObjListExecutor));
-	ReadObjListExecutor *readObjListExecutor = new (p) ReadObjListExecutor();
+	ReadObjListExecutor *readObjListExecutor;
+	InsertExecutor *insertExec;
 	const RowDesc *desc;
-	table->getDesc(desc);
-	readObjListExecutor->setDesc(desc);
-	readObjListExecutor->addObjList(objList);
+	void *p = m_alloc.alloc(sizeof(ReadObjListExecutor));
 
-	p = m_alloc.alloc(sizeof(InsertExecutor));
-	InsertExecutor *insertExec = new (p) InsertExecutor();
+	if ( NULL == p) {
+		VOLT_WARN("Memory is not enough");
+		ret = ERROR;
+	} else {
 
-	insertExec->setTable(table);
-	insertExec->addChild(readObjListExecutor);
+		readObjListExecutor = new (p) ReadObjListExecutor();
+		table->getDesc(desc);
+		readObjListExecutor->setDesc(desc);
+		readObjListExecutor->addObjList(objList);
+	}
 
-	p = m_alloc.alloc(sizeof(PhyPlan));
-	plan = new (p) PhyPlan();
-	plan->m_query = insertExec;
+	if (SUCCESS == ret) {
+		p = m_alloc.alloc(sizeof(InsertExecutor));
 
-	readObjListExecutor->setPhyPlan(plan);
-	insertExec->setPhyPlan(plan);
+		if ( NULL == p) {
+			VOLT_WARN("Memory is not enough");
+			ret = ERROR;
+		} else {
+			insertExec = new (p) InsertExecutor();
+			insertExec->setTable(table);
+			insertExec->addChild(readObjListExecutor);
+		}
+	}
 
+	if (SUCCESS == ret) {
+		p = m_alloc.alloc(sizeof(PhyPlan));
+
+		if ( NULL == p) {
+			VOLT_WARN("Memory is not enough");
+			ret = ERROR;
+		} else {
+			plan = new (p) PhyPlan();
+			plan->m_query = insertExec;
+			readObjListExecutor->setPhyPlan(plan);
+			insertExec->setPhyPlan(plan);
+		}
+	}
 	return ret;
 }
 
@@ -111,29 +155,46 @@ int32_t PhyPlanFactory::genSelectPlan(PhyPlan *&plan, char *inputValues,
 
 	int32_t ret = SUCCESS;
 
-	void *p = m_alloc.alloc(sizeof(GetExecutor));
-	GetExecutor *getExec = new (p) GetExecutor();
-
-	p = m_alloc.alloc(sizeof(ReadExecutor));
-	ReadExecutor *readExec = new (p) ReadExecutor();
-
-	getExec->setTable(table);
-	getExec->addChild(readExec);
-
+	GetExecutor *getExec;
+	ReadExecutor *readExec;
 	const RowDesc *desc;
-	if (SUCCESS != (ret = table->getDesc(desc))) {
 
-		VOLT_ERROR("get row description fail");
+	void *p = m_alloc.alloc(sizeof(GetExecutor));
+
+	if ( NULL == p) {
+		VOLT_WARN("Memory is not enough");
+		ret = ERROR;
 	} else {
-
+		readExec = new (p) ReadExecutor();
+		table->getDesc(desc);
 		readExec->setDesc(desc);
 		readExec->setInput(inputValues, sz);
-		p = m_alloc.alloc(sizeof(PhyPlan));
-		plan = new (p) PhyPlan();
-		plan->m_query = getExec;
+	}
 
-		getExec->setPhyPlan(plan);
-		readExec->setPhyPlan(plan);
+	if (SUCCESS == ret) {
+		p = m_alloc.alloc(sizeof(ReadExecutor));
+		if ( NULL == p) {
+			VOLT_WARN("Memory is not enough");
+			ret = ERROR;
+		} else {
+			getExec = new (p) GetExecutor();
+			getExec->setTable(table);
+			getExec->addChild(readExec);
+		}
+	}
+
+	if (SUCCESS == ret) {
+		p = m_alloc.alloc(sizeof(PhyPlan));
+		if ( NULL == p) {
+			VOLT_WARN("Memory is not enough");
+			ret = ERROR;
+		} else {
+			plan = new (p) PhyPlan();
+			plan->m_query = getExec;
+
+			getExec->setPhyPlan(plan);
+			readExec->setPhyPlan(plan);
+		}
 	}
 	return ret;
 }
@@ -142,63 +203,100 @@ int32_t PhyPlanFactory::genSelectPlan(PhyPlan *&plan, char *inputValues,
  * 生成update的物理计划，最好能让read op只读取RowKey 信息
  */
 int32_t PhyPlanFactory::genUpdatePlan(PhyPlan *&plan, char *inputValues,
-		int32_t sz, Expression expr, RowTable *table) {
+		int32_t sz, Expression& expr, RowTable *table) {
 
 	int32_t ret = SUCCESS;
-
-	void *p = m_alloc.alloc(sizeof(UpdateExecutor));
-
-	UpdateExecutor *updateExec = new (p) UpdateExecutor();
-	updateExec->setExpr(expr);
-	updateExec->setTable(table);
-
-	p = m_alloc.alloc(sizeof(ReadExecutor));
-	ReadExecutor *readExec = new (p) ReadExecutor();
+	UpdateExecutor *updateExec;
+	ReadExecutor *readExec;
 	const RowDesc *desc;
-	if (SUCCESS != (ret = table->getDesc(desc))) {
-		VOLT_ERROR("get table description fail");
+	void *p = m_alloc.alloc(sizeof(ReadExecutor));
+	if ( NULL == p) {
+		VOLT_WARN("Memory is not enough");
+		ret = ERROR;
 	} else {
+
+		readExec = new (p) ReadExecutor();
+		table->getDesc(desc);
 		readExec->setDesc(desc);
 		readExec->setInput(inputValues, sz);
-		updateExec->addChild(readExec);
+	}
 
+	if (SUCCESS == ret) {
+		p = m_alloc.alloc(sizeof(UpdateExecutor));
+		if ( NULL == p) {
+			VOLT_WARN("Memory is not enough");
+			ret = ERROR;
+		} else {
+			updateExec = new (p) UpdateExecutor();
+			updateExec->setExpr(expr);
+			updateExec->setTable(table);
+			updateExec->addChild(readExec);
+		}
+	}
+
+	if (SUCCESS == ret) {
 		p = m_alloc.alloc(sizeof(plan));
-		plan = new (p) PhyPlan();
-		plan->m_query = updateExec;
 
-		updateExec->setPhyPlan(plan);
-		readExec->setPhyPlan(plan);
+		if ( NULL == p) {
+			VOLT_WARN("Memory is not enough");
+			ret = ERROR;
+		} else {
+			plan = new (p) PhyPlan();
+			plan->m_query = updateExec;
+
+			updateExec->setPhyPlan(plan);
+			readExec->setPhyPlan(plan);
+		}
 	}
 	return ret;
 }
 
 int32_t PhyPlanFactory::genUpdatePlan(PhyPlan *&plan, RowKey key,
-		Expression expr, RowTable * table) {
+		Expression& expr, RowTable * table) {
 
 	int32_t ret = SUCCESS;
-
-	void *p = m_alloc.alloc(sizeof(UpdateExecutor));
-
-	UpdateExecutor *updateExec = new (p) UpdateExecutor();
-	updateExec->setExpr(expr);
-	updateExec->setTable(table);
+	UpdateExecutor *updateExec;
+	IndexScanExecutor *indexExec;
+	const RowDesc *desc;
+	void *p;
 
 	p = m_alloc.alloc(sizeof(IndexScanExecutor));
-	IndexScanExecutor *indexExec = new (p) IndexScanExecutor();
-	const RowDesc *desc;
-	if (SUCCESS != (ret = table->getDesc(desc))) {
-		VOLT_ERROR("get table description fail");
+	if ( NULL == p) {
+		VOLT_WARN("Memory is not enough");
+		ret = ERROR;
 	} else {
+		indexExec = new (p) IndexScanExecutor();
+		table->getDesc(desc);
 		indexExec->setIndexKey(key);
 		indexExec->setTable(table);
-		updateExec->addChild(indexExec);
+	}
 
+	if (SUCCESS == ret) {
+		p = m_alloc.alloc(sizeof(UpdateExecutor));
+		if ( NULL == p) {
+			VOLT_WARN("Memory is not enough");
+			ret = ERROR;
+		} else {
+			updateExec = new (p) UpdateExecutor();
+			updateExec->setExpr(expr);
+			updateExec->setTable(table);
+			updateExec->addChild(indexExec);
+		}
+	}
+
+	if (SUCCESS == ret) {
 		p = m_alloc.alloc(sizeof(plan));
-		plan = new (p) PhyPlan();
-		plan->m_query = updateExec;
 
-		updateExec->setPhyPlan(plan);
-		indexExec->setPhyPlan(plan);
+		if ( NULL == p) {
+			VOLT_WARN("Memory is not enough");
+			ret = ERROR;
+		} else {
+			plan = new (p) PhyPlan();
+			plan->m_query = updateExec;
+
+			updateExec->setPhyPlan(plan);
+			indexExec->setPhyPlan(plan);
+		}
 	}
 	return ret;
 }
@@ -237,7 +335,7 @@ int32_t PhyPlanFactory::genSelectPlan(PhyPlan*& plan, char* inputVaules,
 }
 
 int32_t PhyPlanFactory::genUpdatePlan(PhyPlan*& plan, char* inputValues,
-		int32_t sz, Expression expr, int32_t tableId) {
+		int32_t sz, Expression& expr, int32_t tableId) {
 
 	RowTable *table = NULL;
 	if (TableMgr::getInstance()->getTable(tableId, table) == SUCCESS) {
@@ -248,7 +346,7 @@ int32_t PhyPlanFactory::genUpdatePlan(PhyPlan*& plan, char* inputValues,
 }
 
 int32_t PhyPlanFactory::genUpdatePlan(PhyPlan *&plan, RowKey key,
-		Expression expr, int32_t tableId) {
+		Expression& expr, int32_t tableId) {
 
 	RowTable *table = NULL;
 	if (TableMgr::getInstance()->getTable(tableId, table) == SUCCESS) {

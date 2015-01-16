@@ -46,9 +46,9 @@ class Row {
 public:
 	Row();
 	Row(const RowDesc *desc);
-	Row(const Row &obj);
-	const Row & operator = (const Row &obj);
 	virtual ~Row();
+
+	bool assign(const Row &row);
 
 	void setDesc(const RowDesc *desc);
 //	void addCol(RowObj obj);
@@ -61,6 +61,9 @@ public:
 	int deserilization(const char *buf, const int64_t buf_len, int64_t &pos);
 
 private:
+	Row(const Row &obj);
+	const Row & operator = (const Row &obj);
+
 	RowObj m_col[1024];
 	const RowDesc *m_desc;
 };

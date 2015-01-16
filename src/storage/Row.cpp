@@ -97,7 +97,7 @@ void Row::addCol(RowObj obj, int colId) {
 Row::Row(const Row& obj) {
 
 	m_desc = obj.m_desc;
-	for (int i = 0; i < m_desc->getColCnt(); ++i) {
+	for (uint32_t i = 0; i < m_desc->getColCnt(); ++i) {
 		m_col[i] = obj.m_col[i];
 	}
 }
@@ -109,10 +109,20 @@ const Row& Row::operator =(const Row& obj) {
 
 	m_desc = obj.m_desc;
 	assert(m_desc != NULL);
-	for (int i = 0; i < m_desc->getColCnt(); ++i) {
+	for (uint32_t i = 0; i < m_desc->getColCnt(); ++i) {
 		m_col[i] = obj.m_col[i];
 	}
 	return *this;
+}
+
+bool Row::assign(const Row &obj){
+
+	m_desc = obj.m_desc;
+	assert(m_desc != NULL);
+	for (uint32_t i = 0; i < m_desc->getColCnt(); ++i) {
+		m_col[i] = obj.m_col[i];
+	}
+	return true;
 }
 
 int32_t Row::getCol(int32_t colId, RowObj &obj) const {

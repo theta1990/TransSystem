@@ -18,11 +18,25 @@ Expression::Expression(int32_t colId, OpType type) : m_colId(colId), m_type(type
 
 }
 
+Expression::Expression(const Expression &expr){
+	m_colId = expr.m_colId;
+	m_type = expr.m_type;
+	m_arg = expr.m_arg;
+}
+
+const Expression & Expression::operator =(const Expression &expr){
+
+	m_colId = expr.m_colId;
+	m_type = expr.m_type;
+	m_arg = expr.m_arg;
+	return *this;
+}
+
 int32_t Expression::cal(const Row* in, const Row*& out) {
 
 	int32_t ret = SUCCESS;
 
-	m_out  = *in;
+	m_out.assign(*in);
 
 	RowObj ov;
 	m_out.getCol(m_colId, ov);

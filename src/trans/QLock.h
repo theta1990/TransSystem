@@ -36,7 +36,7 @@ private:
 class ScopedLock{
 
 public:
-	inline ScopedLock(QLock lock) : m_lock(lock){
+	inline ScopedLock(QLock &lock) : m_lock(lock){
 		assert( SUCCESS == m_lock.lock_block());
 	}
 

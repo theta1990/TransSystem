@@ -131,6 +131,30 @@ void genTransferTask(TransTask &task, uint16_t id1, uint16_t id2, uint32_t money
 
 int startGenerator(int argc, char **argv) {
 
+	int32_t i = 0;
+
+	createAccountTable();
+	createRecordTable();
+
+	TransTask task;
+	int32_t count;
+	MyServer server;
+	server.startServer();
+
+	for(i=0;i<10000;+i){
+		task.clear();
+		task.setTranId(count++);
+		genAddAccouttask(task, i, 1000);
+//		server.handleTask(task);
+	}
+
+	for(i=0;i<100000;++i){
+		task.clear();
+		task.setTranId(count++);
+		genTransferTask(task, rand()%10000, rand()%10000, rand()%10);
+	}
+
 	return 0;
 }
+TEST(startGenerator);
 

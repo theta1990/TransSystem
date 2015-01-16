@@ -100,5 +100,5 @@ int genPlanTest(int argc, char **argv) {
 
 	return 0;
 }
-TEST(genPlanTest);
+//TEST(genPlanTest);
 
