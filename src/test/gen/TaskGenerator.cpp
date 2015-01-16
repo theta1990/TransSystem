@@ -156,5 +156,5 @@ int startGenerator(int argc, char **argv) {
 
 	return 0;
 }
-TEST(startGenerator);
+//TEST(startGenerator);
 
