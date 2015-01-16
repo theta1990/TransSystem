@@ -44,6 +44,10 @@ public:
 	Executor *getChild(){
 		return NULL;
 	}
+
+	virtual void destroy(){
+		free(m_str);
+	}
 private:
 	char*		m_str;		//这个字段的内存怎么回收呢？
 	int64_t 	m_len;

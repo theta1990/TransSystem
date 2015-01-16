@@ -43,6 +43,9 @@ public:
 		m_plan = plan;
 	}
 	virtual Executor * getChild() = 0;
+
+	virtual void destroy() = 0;
+
 	virtual ~Executor();
 
 private:

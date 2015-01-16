@@ -22,12 +22,11 @@ PhyPlanFactory * PhyPlanFactory::getInstance() {
 	if ( NULL == ins_) {
 
 		ins_ = new PhyPlanFactory();
-		ins_->m_alloc.init(0);
 	}
 	return ins_;
 }
 
-PhyPlanFactory::PhyPlanFactory() {
+PhyPlanFactory::PhyPlanFactory() : m_alloc() {
 	// TODO Auto-generated constructor stub
 
 }
@@ -38,13 +37,7 @@ PhyPlanFactory::~PhyPlanFactory() {
 
 int32_t PhyPlanFactory::deletePlan(PhyPlan*& plan) {
 
-	Executor *exec = plan->m_query;
-	Executor *nxt = NULL;
-	while (NULL != exec) {
-		nxt = exec->getChild();
-		m_alloc.free(exec);
-		exec = nxt;
-	}
+	plan->destory(m_alloc);
 	m_alloc.free(plan);
 	plan = NULL;
 	return SUCCESS;

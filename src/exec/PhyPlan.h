@@ -9,6 +9,7 @@
 #define PHYPLAN_H_
 
 #include "../common.h"
+#include "../common/memory/Allocator.h"
 #include <vector>
 namespace expdb {
 
@@ -52,7 +53,7 @@ public:
 		return m_ctx;
 	}
 
-	void destory();
+	int32_t destory(Allocator &alloc);
 
 	virtual ~PhyPlan();
 

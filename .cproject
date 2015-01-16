@@ -50,6 +50,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.34966429" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1626462020" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="pthread"/>
+									<listOptionValue builtIn="false" value="tcmalloc"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.773067080" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/home/volt/workspace/third_party/boost_1_53_0/stage/lib"/>

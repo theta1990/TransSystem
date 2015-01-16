@@ -138,21 +138,23 @@ int startGenerator(int argc, char **argv) {
 
 	TransTask task;
 	int32_t count;
-	MyServer server;
-	server.startServer();
+//	MyServer server;
+//	server.startServer();
 
-	for(i=0;i<10000;+i){
-		task.clear();
+	for(i=0;i<1000000;+i){
+		task.destroy();
 		task.setTranId(count++);
 		genAddAccouttask(task, i, 1000);
 //		server.handleTask(task);
 	}
+	task.destroy();
 
-	for(i=0;i<100000;++i){
-		task.clear();
-		task.setTranId(count++);
-		genTransferTask(task, rand()%10000, rand()%10000, rand()%10);
-	}
+//	for(i=0;i<10000000;++i){
+//		task.destroy();
+//		task.setTranId(count++);
+//		genTransferTask(task, rand()%10000, rand()%10000, rand()%10);
+//	}
+	task.destroy();
 
 	return 0;
 }

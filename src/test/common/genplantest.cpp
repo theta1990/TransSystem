@@ -25,7 +25,6 @@ int genPlanTest(int argc, char **argv) {
 	char buf[10240];
 
 	rowStreamGen(buf, 10240, pos, keys);
-	alloc.init(0);
 
 	SchemaMgr::getInstance()->getTableDesc("hw", desc);
 	table.setDesc(desc);

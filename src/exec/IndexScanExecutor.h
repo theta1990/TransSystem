@@ -39,6 +39,10 @@ public:
 
 	virtual ~IndexScanExecutor();
 
+	virtual void destroy(){
+
+	}
+
 private:
 
 	RowKey m_key;		//key

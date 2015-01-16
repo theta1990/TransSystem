@@ -22,13 +22,15 @@ int32_t UndoTask::undo() {
 }
 
 UndoTask::~UndoTask() {
-	// TODO Auto-generated destructor stub
+
+	if( m_oldValue != NULL ){
+		VOLT_WARN("Memory leak here");
+	}
 }
 
-Logger::Logger(std::vector<UndoTask> &taskList) :
-		m_alloc(), m_taskList(taskList) {
+Logger::Logger(Allocator &alloc, std::vector<UndoTask> &taskList) :
+		m_alloc(alloc), m_taskList(taskList) {
 
-	m_alloc.init(0);
 }
 
 int32_t Logger::undo(const RowDesc* desc, RowValue* value) {
@@ -47,7 +49,18 @@ int32_t Logger::undo(const RowDesc* desc, RowValue* value) {
 	}
 }
 
+int32_t Logger::destroy(){
+
+	for(std::vector<UndoTask>::iterator it = m_taskList.begin(); it != m_taskList.end(); it++){
+
+		it->destroy(m_alloc);
+	}
+	return SUCCESS;
+}
+
 Logger::~Logger() {
+
+	destroy();
 }
 
 } /* namespace expdb */

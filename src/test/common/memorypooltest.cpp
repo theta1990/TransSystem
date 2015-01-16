@@ -20,8 +20,8 @@ void *memoryThread(void *arg) {
 	uint32_t iter = 1024;
 	void *store[1024];
 	uint8_t sizeList[1024];
-	uint8_t allRound = 128;
-	uint8_t round = allRound;
+	uint32_t allRound = 1280;
+	uint32_t round = allRound;
 	while (round--) {
 
 		for (uint32_t i = 0; i < iter; ++i) {
@@ -33,6 +33,7 @@ void *memoryThread(void *arg) {
 		for (uint32_t i = 0; i < iter; ++i) {
 
 			p = malloc(sizeof(sizeList[i]));
+//			free(p);
 			store[i] = p;
 		}
 

@@ -72,6 +72,20 @@ public:
 		return m_retCode;
 	}
 
+	int32_t destroy(Allocator &alloc){
+
+		int32_t ret = SUCCESS;
+		if( SUCCESS != (ret = m_logger->destroy())){
+			VOLT_WARN("logger destroy fail");
+		}
+		m_cbTaskList.clear();
+		m_undoTaskList.clear();
+		alloc.free(m_lock);
+		alloc.free(m_logger);
+
+		return ret;
+	}
+
 	friend TaskContextMgr;
 private:
 

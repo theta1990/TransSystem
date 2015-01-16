@@ -14,7 +14,6 @@ namespace expdb {
 
 TransExecQueue::TransExecQueue() :
 		m_queue(128), m_done(false), m_stat() {
-	m_alloc.init(0);
 }
 
 int TransExecQueue::push(TransTask task) {

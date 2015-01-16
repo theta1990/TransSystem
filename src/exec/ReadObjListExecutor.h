@@ -37,6 +37,11 @@ public:
 		return NULL;
 	}
 
+	virtual void destroy(){
+//		m_objList.clear();
+		m_objList.~vector();
+	}
+
 	virtual ~ReadObjListExecutor();
 
 private:

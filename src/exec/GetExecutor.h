@@ -35,6 +35,12 @@ public:
 	Executor *getChild(){
 		return m_child;
 	}
+
+	virtual void destroy(){
+		m_table = NULL;
+		m_child = NULL;
+	}
+
 private:
 
 	const RowTable *m_table;

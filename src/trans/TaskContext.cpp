@@ -13,7 +13,7 @@ TaskContextMgr* TaskContextMgr::ins_ = NULL;
 
 TaskContext::TaskContext() :
 		m_cbTaskList(), m_undoTaskList(), m_lock(NULL), m_logger(NULL), m_transId(
-				0), m_rollback(false) {
+				0), m_rollback(false), m_retCode(0) {
 	// TODO Auto-generated constructor stub
 }
 
@@ -94,7 +94,7 @@ int32_t TaskContextMgr::newContext(int32_t tid, TaskContext*& ctx,
 	void *plogger = alloc.alloc(sizeof(Logger));
 	ctx = new (p) TaskContext();
 	lock = new (plock) RCLockInfo(ctx->m_cbTaskList);
-	logger = new (plogger) Logger(ctx->m_undoTaskList);
+	logger = new (plogger) Logger(alloc, ctx->m_undoTaskList);
 
 	ctx->setLockInfo(lock);
 	ctx->setLogger(logger);
@@ -106,10 +106,7 @@ int32_t TaskContextMgr::releaseContext(TaskContext *ctx, Allocator& alloc) {
 
 	int32_t ret = SUCCESS;
 
-	LockInfo *info = NULL;
-	ctx->getLockInfo(info);
-	if ( NULL != info)
-		alloc.free(info);
+	ctx->destroy(alloc);
 	alloc.free(ctx);
 	return ret;
 }

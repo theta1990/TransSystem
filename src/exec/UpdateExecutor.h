@@ -45,6 +45,10 @@ public:
 		return m_childop;
 	}
 
+	virtual void destroy(){
+
+	}
+
 private:
 	Executor	*m_childop;
 	const Row 	*m_curRow;	//记录当前访问到的行

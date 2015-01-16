@@ -203,7 +203,6 @@ int32_t RowTable::update(TaskContext& ctx, RowKey key, Expression *expr) {
 int RowTable::setDesc(const RowDesc *desc) {
 
 	m_desc = desc;
-	m_alloc.init(m_desc->getRowLen());
 
 	return SUCCESS;
 }

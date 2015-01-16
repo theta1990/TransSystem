@@ -34,6 +34,10 @@ public:
 	Executor * getChild(){
 		return m_child;
 	}
+
+	virtual void destroy(){
+
+	}
 private:
 
 	Executor		*m_child;

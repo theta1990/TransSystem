@@ -12,7 +12,6 @@ namespace expdb {
 MyServer::MyServer() :
 		m_count(DefaultWorkerThread), m_alloc() {
 
-	m_alloc.init(0);
 }
 
 MyServer::~MyServer() {
