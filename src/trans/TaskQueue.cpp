@@ -24,6 +24,7 @@ TaskQueue::TaskQueue() : m_pid(0) {
 void* TaskQueue::run(void *arg) {
 
 	TaskQueue* _ins = (TaskQueue*)arg;
+//	setAffinity(ins->getCoreId());
 	_ins ->work();
 	return NULL;
 }

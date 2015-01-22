@@ -23,6 +23,10 @@ struct RowValue {
 	int8_t m_flag;
 	char m_value[0];
 
+	void clear(){
+		m_lock.reset();
+	}
+
 	bool isDelete() const{
 
 		return (m_flag & 1) == 1;

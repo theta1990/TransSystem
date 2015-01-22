@@ -34,19 +34,17 @@ int32_t InsertExecutor::open() {
 			ret = ERROR;
 		} else {
 			while (true) {
-				if (END == m_child->next(row)) {
+				if (SUCCESS != m_child->next(row)) {
 					break;
 				} else {
 
 					if (SUCCESS != (ret = m_table->insert(*ctx, row))) {
 						VOLT_WARN("insert fails");
 						row->dump();
-						printf("\n");
 						break;
 					}else {
 						VOLT_INFO("insert success");
 						row->dump();
-						printf("\n");
 					}
 				}
 			}

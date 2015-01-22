@@ -19,6 +19,8 @@ public:
 
 	int32_t startServer();
 	int32_t handleTask(TransTask task);
+
+	int32_t waitForExit();
 private:
 
 	TransExecQueue*	m_threadPools[MaxWorkerThread];

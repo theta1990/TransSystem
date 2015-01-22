@@ -12,6 +12,7 @@ using namespace expdb;
 void createAccountTable() {
 
 	RowDesc desc;
+	const RowDesc *storedDesc;
 	int32_t id;
 	desc.addRowType(SMALLINT);
 	desc.addRowType(MIDINT);
@@ -20,10 +21,10 @@ void createAccountTable() {
 	priIdx[0] = 0;
 	desc.setPriIdx(priIdx, 1);
 
-	if (SUCCESS != SchemaMgr::getInstance()->addTable("account", &desc)) {
+	if (SUCCESS != SchemaMgr::getInstance()->addTable("account", &desc, storedDesc)) {
 
 		VOLT_ERROR("Create schema failed");
-	} else if (TableMgr::getInstance()->createTable(&desc, id) != SUCCESS) {
+	} else if (TableMgr::getInstance()->createTable(storedDesc, id) != SUCCESS) {
 
 		VOLT_ERROR("Create table failed");
 	}
@@ -35,16 +36,17 @@ void createAccountTable() {
 void createRecordTable() {
 
 	RowDesc desc;
+	const RowDesc *storedDesc;
 	int32_t id;
 
 	desc.addRowType(SMALLINT);
 	desc.addRowType(SMALLINT);
 	desc.addRowType(MIDINT);
 
-	if (SUCCESS != SchemaMgr::getInstance()->addTable("record", &desc)) {
+	if (SUCCESS != SchemaMgr::getInstance()->addTable("record", &desc, storedDesc)) {
 
 		VOLT_ERROR("Create schema failed");
-	} else if (TableMgr::getInstance()->createTable(&desc, id) != SUCCESS) {
+	} else if (TableMgr::getInstance()->createTable(storedDesc, id) != SUCCESS) {
 
 		VOLT_ERROR("Create table failed");
 	}
@@ -68,33 +70,40 @@ void genAddAccountTask(TransTask &task, char *inputValues, int32_t sz) {
 
 	PhyPlan *plan;
 	RowTable *table;
-	TableMgr::getInstance()->getTable(0, table);
+	int32_t tableId;
+	SchemaMgr::getInstance()->getTableId("account", tableId);
+	TableMgr::getInstance()->getTable(tableId, table);
 
 	PhyPlanFactory::getInstance()->genInsertPlan(plan, inputValues, sz, table);
 	task.addPhyPlan(plan);
 }
 
-void genAddAccouttask(TransTask &task, uint16_t id, uint32_t money){
+void genAddAccouttask(TransTask &task, uint16_t id, uint32_t money) {
 
 	PhyPlan *plan;
 	RowTable *table;
-	TableMgr::getInstance()->getTable(0, table);
+	int32_t tableId;
+	SchemaMgr::getInstance()->getTableId("account", tableId);
+	TableMgr::getInstance()->getTable(tableId, table);
 
 	std::vector<RowObj> objList;
 	objList.push_back(RowObj(id));
 	objList.push_back(RowObj(money));
-	PhyPlanFactory::getInstance()->genInsertPlan(plan, objList,table);
+	PhyPlanFactory::getInstance()->genInsertPlan(plan, objList, table);
 	task.addPhyPlan(plan);
 }
 
-
-void genTransferTask(TransTask &task, uint16_t id1, uint16_t id2, uint32_t money) {
+void genTransferTask(TransTask &task, uint16_t id1, uint16_t id2,
+		uint32_t money) {
 
 	PhyPlan *sourcePlan, *destPlan, *recordPlan;
 	RowTable *account, *record;
 
-	TableMgr::getInstance()->getTable(0, account);
-	TableMgr::getInstance()->getTable(1, record);
+	int32_t accountId, recordId;
+	SchemaMgr::getInstance()->getTableId("account", accountId);
+	TableMgr::getInstance()->getTable(accountId, account);
+	SchemaMgr::getInstance()->getTableId("record", recordId);
+	TableMgr::getInstance()->getTable(recordId, record);
 
 	Expression expr1(1, MIN);
 	RowObj obj1;
@@ -106,7 +115,6 @@ void genTransferTask(TransTask &task, uint16_t id1, uint16_t id2, uint32_t money
 	PhyPlanFactory::getInstance()->genUpdatePlan(sourcePlan, key1, expr1,
 			account);
 
-
 	RowObj obj2;
 	RowKey key2;
 	Expression expr2(1, ADD);
@@ -114,8 +122,8 @@ void genTransferTask(TransTask &task, uint16_t id1, uint16_t id2, uint32_t money
 	expr2.setArg(obj2);
 
 	obj2.setSmallInt(id2);
-	PhyPlanFactory::getInstance()->genUpdatePlan(destPlan, key2, expr2, account);
-
+	PhyPlanFactory::getInstance()->genUpdatePlan(destPlan, key2, expr2,
+			account);
 
 	std::vector<RowObj> objList;
 	objList.push_back(RowObj(id1));
@@ -128,7 +136,6 @@ void genTransferTask(TransTask &task, uint16_t id1, uint16_t id2, uint32_t money
 	task.addPhyPlan(recordPlan);
 }
 
-
 int startGenerator(int argc, char **argv) {
 
 	int32_t i = 0;
@@ -137,26 +144,27 @@ int startGenerator(int argc, char **argv) {
 	createRecordTable();
 
 	TransTask task;
-	int32_t count;
-//	MyServer server;
-//	server.startServer();
+	int32_t count = 0 ;
+	MyServer server;
+	server.startServer();
 
-	for(i=0;i<1000000;+i){
-		task.destroy();
+	for (i = 0; i < 100000; ++i) {
+		task.clear();
 		task.setTranId(count++);
 		genAddAccouttask(task, i, 1000);
-//		server.handleTask(task);
+		server.handleTask(task);
 	}
-	task.destroy();
+//	task.destroy();
+
+	server.waitForExit();
 
 //	for(i=0;i<10000000;++i){
 //		task.destroy();
 //		task.setTranId(count++);
 //		genTransferTask(task, rand()%10000, rand()%10000, rand()%10);
 //	}
-	task.destroy();
 
 	return 0;
 }
-//TEST(startGenerator);
+TEST(startGenerator);
 

@@ -43,4 +43,15 @@ int32_t MyServer::handleTask(TransTask task) {
 	return ret;
 }
 
+int32_t MyServer::waitForExit() {
+
+	int32_t ret = SUCCESS;
+
+	for(int i = 0;i<m_count;++i){
+		m_threadPools[i]->join();
+	}
+
+	return ret;
+}
+
 } /* namespace expdb */

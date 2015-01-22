@@ -94,6 +94,7 @@ int TransExecQueue::handleTask(TransTask& task) {
 		}
 
 		ctx->postProcess();
+		TaskContextMgr::getInstance()->releaseContext(ctx, m_alloc);
 
 		if( SUCCESS == ctx->getRetCode() ) {//transaction successfully processed
 
@@ -101,9 +102,9 @@ int TransExecQueue::handleTask(TransTask& task) {
 			task.destroy();
 		}else {	//re-process the transaction
 
+			VOLT_INFO("ReExecute trans %d", task.getTranId());
 			m_queue.push(task);
 		}
-		TaskContextMgr::getInstance()->releaseContext(ctx, m_alloc);
 	}
 
 	return SUCCESS;

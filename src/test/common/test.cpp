@@ -14,11 +14,12 @@ void initSchema(){
 
 	SchemaMgr* schema = SchemaMgr::getInstance();
 	RowDesc desc;
+	const RowDesc *storedDesc;
 	const RowDesc *tableSche;
 	desc.addRowType(SMALLINT);
 	desc.addRowType(MIDINT);
 
-	schema->addTable("hw", &desc);
+	schema->addTable("hw", &desc, storedDesc);
 
 	schema->getTableDesc("hw", tableSche);
 
@@ -31,7 +32,7 @@ void initSchema(){
 
 int main(int argc, char **argv){
 
-	initSchema();
+//	initSchema();
 	func(argc, argv);
 	return 0;
 }

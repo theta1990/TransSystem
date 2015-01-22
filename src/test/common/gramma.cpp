@@ -44,10 +44,23 @@ int testRef(int *&a){
 	printf("%d", *a);
 }
 
+template <class T>
+class Array {
+public:
+	Array(int lowBound, int highBound);
+	Array(int size);
+
+	T & operator [](int index);
+
+//	bool operator == (const Array<int> &lhs, const Array<int> &rhs);
+};
+
+
+
 int grammaTest(int argc, char **argv){
 
 //	int a = 0;
-////	const int *ref = &a;
+//	const int *ref = &a;
 //	int *pa = &a;
 //	int *&ref = pa;
 ////	int *&ref1 = &a;
@@ -64,8 +77,16 @@ int grammaTest(int argc, char **argv){
 //	*a = 10;
 //	int b = 10;
 
-	int a = 1;
-	printf("%x", ~a);
+//	Array<int> a(10);
+//	Array<int> b(10);
+
+//	for(int i = 0; i<10;++i)
+//		if( a == static_cast< Array<int> >(b[i]) ) {
+//			printf("yes");
+//		}
+
+//	int a = 1;
+//	printf("%x", ~a);
 
 //	testRef(&b);
 

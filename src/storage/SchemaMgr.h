@@ -32,15 +32,15 @@ public:
 
 	int32_t getTableDesc(const char *name, 		const RowDesc *&desc);
 	int32_t getTableDesc(const int32_t tableId, const RowDesc *&desc);
+	int32_t getTableId(const char *name, int32_t &tableId);
 
-	int32_t addTable(const char *name, const RowDesc *desc);
+	int32_t addTable(const char *name, const RowDesc *desc, const RowDesc *&storedDesc);
 
 private:
 	SchemaMgr();
 
 	static SchemaMgr * ins__;
 
-	int32_t getTableId(const char *name, int32_t &tableId);
 
 	TableInfo	m_tableList[MAXTABLENUM];
 	int32_t		m_tableCnt;

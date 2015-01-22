@@ -60,7 +60,7 @@ int32_t SchemaMgr::getTableDesc(const int32_t tableId, const RowDesc*& desc) {
 	return ret;
 }
 
-int32_t SchemaMgr::addTable(const char* name, const RowDesc* desc) {
+int32_t SchemaMgr::addTable(const char* name, const RowDesc* desc, const RowDesc *&storedDesc) {
 
 	int32_t ret = SUCCESS;
 	int32_t id;
@@ -77,6 +77,7 @@ int32_t SchemaMgr::addTable(const char* name, const RowDesc* desc) {
 
 		m_tableList[m_tableCnt].m_tableId = m_tableCnt;
 		m_tableList[m_tableCnt].m_desc = *desc;
+		storedDesc = &m_tableList[m_tableCnt].m_desc;
 		strcpy(m_tableList[m_tableCnt].m_tableName, name);
 		m_tableCnt++;
 	}

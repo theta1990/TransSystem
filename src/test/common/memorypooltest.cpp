@@ -78,5 +78,5 @@ int testmemorypool(int argc, char **argv) {
 
 	return 0;
 }
-TEST(testmemorypool);
+//TEST(testmemorypool);
 

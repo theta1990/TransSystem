@@ -76,6 +76,7 @@ int32_t RowTable::insert(TaskContext &ctx, const Row *row) {
 				VOLT_WARN("Memory is not enough");
 				ret = ERROR;
 			} else {
+				value->clear();
 				value->setDeleted();
 				if (SUCCESS != (ret = m_priIndex.insert(key, value))) {
 					VOLT_WARN("Insert failure");
