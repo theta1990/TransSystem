@@ -35,7 +35,8 @@ int32_t IndexScanExecutor::next(const Row *&nextRow) {
 
 	if (SUCCESS != (ret = const_cast<RowTable*>(m_table)->get(m_key, m_row))) {
 
-		VOLT_DEBUG("does not find key in the table");
+		VOLT_DEBUG("Does not find key in the table, %d", ret);
+		ret = END;
 	} else {
 		nextRow = &m_row;
 	}

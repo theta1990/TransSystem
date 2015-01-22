@@ -55,6 +55,10 @@ public:
 
 	int32_t destory(Allocator &alloc);
 
+	void reset(){
+
+	}
+
 	virtual ~PhyPlan();
 
 private:

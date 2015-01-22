@@ -24,6 +24,7 @@ class PhyPlan;
 
 class TaskContextMgr;
 
+
 /**
  * 应该还需要一个undo list，将所有的修改回滚
  */
@@ -31,6 +32,10 @@ class TaskContext {
 public:
 	TaskContext();
 	virtual ~TaskContext();
+
+	void setTransId(int32_t tid){
+		m_transId = tid;
+	}
 
 	int32_t setLockInfo(LockInfo *info) {
 		m_lock = info;
@@ -63,13 +68,23 @@ public:
 	}
 
 	int32_t handleLockFailure();
-	int32_t rollback();
 
 	int32_t startProcess();
 	int32_t postProcess();
 
+	int32_t commit(){
+
+		//TODO we can flush log here
+		return SUCCESS;
+	}
+	int32_t rollback();
+
 	int32_t getRetCode() {
 		return m_retCode;
+	}
+
+	void setErrorCode(int32_t ec){
+		m_retCode = ec;
 	}
 
 	int32_t destroy(Allocator &alloc){

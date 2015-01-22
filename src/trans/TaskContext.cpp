@@ -13,7 +13,7 @@ TaskContextMgr* TaskContextMgr::ins_ = NULL;
 
 TaskContext::TaskContext() :
 		m_cbTaskList(), m_undoTaskList(), m_lock(NULL), m_logger(NULL), m_transId(
-				0), m_rollback(false), m_retCode(0) {
+				0), m_rollback(false), m_retCode(SUCCESS) {
 	// TODO Auto-generated constructor stub
 }
 
@@ -34,13 +34,12 @@ int32_t TaskContext::rollback() {
 
 	int32_t ret = SUCCESS;
 	m_rollback = true;
-
+	VOLT_INFO("roll back trans: %d", m_transId);
 	for(uint32_t i = 0;i<m_undoTaskList.size();++i){
 		if( SUCCESS != m_undoTaskList[i].undo()) {
 			VOLT_ERROR("ops, undo failure, what is impossible!!");
 		}
 	}
-
 //	for (uint32_t i = 0; i < m_cbTaskList.size(); ++i) {
 //		if (SUCCESS != m_cbTaskList[i].callback()) {
 //			VOLT_DEBUG("roll back, unlock failed");
@@ -98,7 +97,7 @@ int32_t TaskContextMgr::newContext(int32_t tid, TaskContext*& ctx,
 
 	ctx->setLockInfo(lock);
 	ctx->setLogger(logger);
-
+	ctx->setTransId(tid);
 	return ret;
 }
 

@@ -41,8 +41,10 @@ int32_t Logger::undo(const RowDesc* desc, RowValue* value) {
 
 		memcpy(oldValue, value->m_value, desc->getRowLen());
 
-		m_taskList.push_back(
-				UndoTask(value, desc->getRowLen(), value->m_flag, oldValue));
+		UndoTask task(value, desc->getRowLen(), value->m_flag, oldValue);
+		m_taskList.push_back(task);
+		task.m_oldValue = NULL;
+
 		return SUCCESS;
 	} else {
 		return ERROR;

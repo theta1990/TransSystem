@@ -45,7 +45,7 @@ int LockMgr::acquireLock(const unsigned int tranId, unsigned int lockId) {
 		}
 	} else {
 
-		ret = LOCK_NOT_FREE;
+		ret = LOCK_CONFLICT;
 		VOLT_WARN("lock[%d] occupied, trans[%d] conflict with trans[%d]",lockId, tranId, oldValue);
 	}
 	return ret;

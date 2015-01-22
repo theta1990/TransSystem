@@ -23,15 +23,15 @@ class TransTask {
 public:
 	TransTask();
 	TransTask(const TransTask &obj);
-	const unsigned int getSize(){
+	const unsigned int getSize() {
 
 		return m_size;
 	}
-	const unsigned int getTranId(){
+	const unsigned int getTranId() {
 
 		return m_tranId;
 	}
-	unsigned int getPro(){
+	unsigned int getPro() {
 
 		return m_pro;
 	}
@@ -48,9 +48,9 @@ public:
 		return ret;
 	}
 
-	PhyPlan *getNextPlan(){
+	PhyPlan *getNextPlan() {
 
-		return m_planlist[m_pro++];
+		return m_pro < m_size ? m_planlist[m_pro++] : NULL;
 	}
 
 	int32_t addPhyPlan(PhyPlan *plan) {
@@ -59,18 +59,23 @@ public:
 	}
 	int32_t setTranId(uint32_t tranId);
 
-	void clear(){
+	void clear() {
 		m_size = 0;
 		m_pro = 0;
 	}
 
+	void reset() {
+		m_pro = 0;
+		for (uint32_t i = 0; i < m_size; ++i)
+			m_planlist[i]->reset();
+	}
 	void destroy();
 
 	friend class TransTaskFactory;
 private:
 
 	unsigned int m_size;
-	PhyPlan*     m_planlist[MAXTRANSIZE];
+	PhyPlan* m_planlist[MAXTRANSIZE];
 	unsigned int m_pro;	//已经完成的计划数量
 	unsigned int m_tranId;	//事务号
 };

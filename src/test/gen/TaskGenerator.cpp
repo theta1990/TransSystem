@@ -14,7 +14,7 @@ void createAccountTable() {
 	RowDesc desc;
 	const RowDesc *storedDesc;
 	int32_t id;
-	desc.addRowType(SMALLINT);
+	desc.addRowType(MIDINT);
 	desc.addRowType(MIDINT);
 	int32_t priIdx[8];
 
@@ -89,8 +89,12 @@ void genAddAccouttask(TransTask &task, uint16_t id, uint32_t money) {
 	std::vector<RowObj> objList;
 	objList.push_back(RowObj(id));
 	objList.push_back(RowObj(money));
-	PhyPlanFactory::getInstance()->genInsertPlan(plan, objList, table);
-	task.addPhyPlan(plan);
+	if( SUCCESS ==  PhyPlanFactory::getInstance()->genInsertPlan(plan, objList, table) ) {
+		task.addPhyPlan(plan);
+	}else {
+		VOLT_ERROR("Create plan failed");
+		assert(0);
+	}
 }
 
 void genTransferTask(TransTask &task, uint16_t id1, uint16_t id2,

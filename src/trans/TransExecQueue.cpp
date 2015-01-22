@@ -83,27 +83,42 @@ int TransExecQueue::handleTask(TransTask& task) {
 						//here we can set response
 						;
 				}
-				if ( NULL != exec)
-					exec->close();
-				if (SUCCESS != rc) {
-					ctx->rollback();
+
+				if( END != rc ){
+
+					if( SUCCESS == ctx->getRetCode() ) {
+						VOLT_ERROR("Context ret code is not set properly");
+						ctx->setErrorCode(ERROR);
+					}
 					break;
-				}else {
 				}
 			}
 		}
 
-		ctx->postProcess();
-		TaskContextMgr::getInstance()->releaseContext(ctx, m_alloc);
+		rc = ctx->getRetCode();
+		if( SUCCESS != rc ) {
+			ctx->rollback();
+		}else {
+			ctx->commit();
+		}
 
-		if( SUCCESS == ctx->getRetCode() ) {//transaction successfully processed
+		ctx->postProcess();
+
+		TaskContextMgr::getInstance()->releaseContext(ctx, m_alloc);
+		if( SUCCESS == rc ) { //transaction successfully processed
 
 			VOLT_INFO("Successfully handle trans %d", task.getTranId());
 			task.destroy();
+		}else if( LOCK_CONFLICT == rc ) {
+
+			VOLT_INFO("Trans[%d] failed due to lock conflict", task.getTranId());
+			task.reset();
+			m_queue.push(task);
 		}else {	//re-process the transaction
 
-			VOLT_INFO("ReExecute trans %d", task.getTranId());
-			m_queue.push(task);
+			VOLT_INFO("Trans failed due to error[%d]", rc);
+			task.destroy();
+//			m_queue.push(task);		//这里写的肯定简单了
 		}
 	}
 

@@ -66,6 +66,7 @@ int32_t RowTable::insert(TaskContext &ctx, const Row *row) {
 	Logger *logger = NULL;
 	if (SUCCESS != (ret = row->getRowKey(key))) {
 		VOLT_WARN("Primary key is not provided");
+		ret = INPUT_ERROR;
 	} else if (SUCCESS != (ret = m_priIndex.find(key, value))) {
 
 		if (NOTFOUND == ret) {
@@ -74,12 +75,13 @@ int32_t RowTable::insert(TaskContext &ctx, const Row *row) {
 							sizeof(QLock) + sizeof(int8_t)
 									+ m_desc->getRowLen()))) {
 				VOLT_WARN("Memory is not enough");
-				ret = ERROR;
+				ret = MEMORY_ERROR;
 			} else {
 				value->clear();
 				value->setDeleted();
 				if (SUCCESS != (ret = m_priIndex.insert(key, value))) {
 					VOLT_WARN("Insert failure");
+					ret = INDEX_ERROR;
 				}
 			}
 		}
@@ -89,8 +91,10 @@ int32_t RowTable::insert(TaskContext &ctx, const Row *row) {
 
 		if (SUCCESS != (ret = ctx.getLockInfo(lock))) {
 			VOLT_ERROR("Context does not has lock info");
+			ret = ERROR;
 		} else if (SUCCESS != (ret = lock->writeBegin(value))) {
-			VOLT_WARN("lock failure");
+			VOLT_WARN("lock failure, value location: 0x%p, lock state: %d, owner: %d", value, value->m_lock.getValue(), value->m_lock.getOwner());
+			ret = LOCK_CONFLICT;
 			//post process here;
 			//not here, the caller handle the lock failure
 		} else if (!value->isDelete()) {
@@ -104,6 +108,10 @@ int32_t RowTable::insert(TaskContext &ctx, const Row *row) {
 		} else if (SUCCESS != (ret = set(value, row))) {
 			VOLT_WARN("modify row failure");
 		}
+	}
+
+	if( SUCCESS != ret ) {
+		ctx.setErrorCode(ret);
 	}
 	return ret;
 }
@@ -179,7 +187,7 @@ int32_t RowTable::update(TaskContext& ctx, RowKey key, Expression *expr) {
 		ret = NOT_EXIST;
 	} else if (SUCCESS != lockinfo->writeBegin(value)) {
 		VOLT_WARN("lock failed");
-		ret = LOCK_NOT_FREE;
+		ret = LOCK_CONFLICT;;
 	} else {
 
 		if (SUCCESS != (ret = ctx.getLogger(logger))) {
@@ -197,6 +205,9 @@ int32_t RowTable::update(TaskContext& ctx, RowKey key, Expression *expr) {
 				set(value, newRow);
 			}
 		}
+	}
+	if( ret != SUCCESS ) {
+		ctx.setErrorCode(ret);
 	}
 	return ret;
 }

@@ -13,7 +13,10 @@
 
 namespace expdb {
 
+class Logger;
+
 class UndoTask {
+	friend Logger;
 public:
 	UndoTask(RowValue *value, int32_t len, int8_t flag, char *oldValue);
 

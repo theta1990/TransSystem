@@ -8,9 +8,10 @@
 #include "QLock.h"
 #include "../common/atomic.h"
 #include "../clock.h"
+#include <unistd.h>
 namespace expdb {
 
-QLock::QLock() : m_lock(0) {
+QLock::QLock() : m_lock(0), m_owner(0) {
 	// TODO Auto-generated constructor stub
 
 }
@@ -46,6 +47,7 @@ int32_t expdb::QLock::lock() {
 	while( true ) {
 
 		if( 0 == atomic::atomic_compare_exchange(&m_lock, 1, 0) ){
+			m_owner = getpid();
 			break;
 		}else if( getCycleCount() - beginTime > m_TIMEOUT ){
 

@@ -44,7 +44,7 @@ int32_t ReadObjListExecutor::next(const Row *&row) {
 		m_curRow->setCol(i, m_objList[m_pos]);
 	}
 	if( i != m_desc->getColCnt() ){
-		ret = ERROR;
+		ret = END;	//reach end of the obj list
 	}
 	if( SUCCESS == ret ) {
 

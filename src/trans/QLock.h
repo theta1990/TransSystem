@@ -25,11 +25,20 @@ public:
 	int32_t unlock();
 	int32_t reset();
 
+	uint8_t getValue(){
+		return m_lock;
+	}
+
+	pid_t getOwner(){
+		return m_owner;
+	}
+
 	virtual ~QLock();
 
 private:
 
 	volatile uint8_t	m_lock;
+	pid_t		m_owner;
 	const static uint64_t m_TIMEOUT = 1000;
 };
 
