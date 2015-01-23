@@ -16,9 +16,24 @@ public:
 	RowDesc();
 	virtual ~RowDesc();
 
-	void addRowType(RowType type);
-	uint32_t getColCnt() const;
-	uint32_t getRowLen() const;
+	int32_t addRowType(RowType type, uint32_t len = 0);
+
+	uint32_t getColCnt() const {
+
+		return m_colCnt;
+	}
+	uint32_t getRowLen() const {
+		return m_totalLen;
+	}
+
+	uint32_t getColLen(uint32_t colIdx) const {
+
+		if( colIdx < m_colCnt)
+			return m_len[colIdx];
+		else {
+			return 0;
+		}
+	}
 
 	int32_t setPriIdx(int32_t *priIdx, int8_t size){
 
@@ -29,7 +44,7 @@ public:
 		}else {
 
 			for (int8_t i = 0; i < size; ++i) {
-				if (priIdx[i] > m_colCnt) {
+				if (static_cast<uint32_t>(priIdx[i]) > m_colCnt) {
 					VOLT_ERROR("Index out of bound, %d(%d)", priIdx[i],
 							m_colCnt);
 					ret = ERROR;
@@ -59,6 +74,8 @@ private:
 	int32_t m_priIdx[8];
 	uint32_t m_colCnt;
 	RowType m_type[1024];
+	uint32_t m_len[1024];
+	uint32_t m_totalLen;
 };
 
 } /* namespace expdb */

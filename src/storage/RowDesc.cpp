@@ -9,7 +9,7 @@
 #include "RowObj.h"
 namespace expdb {
 
-RowDesc::RowDesc() : m_colCnt(0) {
+RowDesc::RowDesc() : m_colCnt(0), m_totalLen(0){
 	// TODO Auto-generated constructor stub
 
 }
@@ -20,27 +20,26 @@ RowDesc::~RowDesc() {
 
 
 
-void RowDesc::addRowType(RowType type) {
+int32_t RowDesc::addRowType(RowType type, uint32_t len) {
 
-	m_type[m_colCnt++] = type;
-}
-
-uint32_t RowDesc::getColCnt() const{
-
-	return m_colCnt;
-}
-
-uint32_t RowDesc::getRowLen() const{
-
-	uint32_t ret = 0;
-
-	for(uint32_t i = 0; i < m_colCnt; ++i){
-
-		ret += RowObj::getSize(m_type[i]);
+	int32_t ret = SUCCESS;
+	if( type == STR ){
+		if( len == 0 ) {
+			VOLT_ERROR("Can not set the length of string to 0");
+			ret = ERROR;
+		}else {
+			m_len[m_colCnt] = len;
+		}
+	}else {
+		m_len[m_colCnt] = RowObj::getSize(type);
 	}
-
+	if( SUCCESS == ret ){
+		m_totalLen += m_len[m_colCnt];
+		m_type[m_colCnt++] = type;
+	}
 	return ret;
 }
+
 
 RowType RowDesc::getRowtype(uint32_t colIdx)const {
 

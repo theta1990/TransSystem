@@ -43,9 +43,9 @@ int32_t RCLockInfo::readBegin(RowValue*& value) {
 int32_t RCLockInfo::writeBegin(RowValue*& value) {
 
 	int32_t ret = SUCCESS;
-
+	VOLT_DEBUG("before lock[%p], state %d", value, value->m_lock.getValue());
 	if( (ret = value->m_lock.lock()) != SUCCESS){
-		VOLT_DEBUG("lock failed");
+		VOLT_DEBUG("lock failed[%p], state %d", value, value->m_lock.getValue());
 	}else {
 		m_cbTasks.push_back(CallbackTask(value));
 //		m_undoTasks.push_back(UndoTask(value));

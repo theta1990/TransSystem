@@ -31,9 +31,9 @@ int rowGen(Row &row) {
 		case BIGINT:
 			obj.setBigInt(rand() % 100);
 			break;
-		case CHAR:
-			obj.setChar(rand() % ('z' - 'a' + 1) + 'a');
-			break;
+//		case CHAR:
+//			obj.setChar(rand() % ('z' - 'a' + 1) + 'a');
+//			break;
 		default:
 			VOLT_ERROR("type %s not supported now", TypeName[type])
 			;
@@ -50,7 +50,7 @@ void *worker(void *arg) {
 	RowKey key;
 	std::vector<RowKey> *keys = new std::vector<RowKey>();
 
-	printf("create keys %x\n", keys);
+	printf("create keys %p\n", keys);
 
 	for (int i = 0; i < 200; ++i) {
 		rowGen(row);
@@ -82,11 +82,11 @@ int tabletest(int argc, char **argv) {
 
 	if (0 == pthread_join(tid1, (void **) &keys1)) {
 		printf("thread1 joined\n");
-		printf("-keys %x\n", keys1);
+		printf("-keys %p\n", keys1);
 	}
 	if (0 == pthread_join(tid2, (void **) &keys2)) {
 		printf("thread2 joined\n");
-		printf("-keys %x\n", keys2);
+		printf("-keys %p\n", keys2);
 	}
 
 	printf("Row inserted by thread1\n");

@@ -6,6 +6,7 @@
  */
 
 #include "InsertExecutor.h"
+#include "../trans/TaskContext.h"
 #include "../storage/Row.h"
 namespace expdb {
 
@@ -34,7 +35,8 @@ int32_t InsertExecutor::open() {
 			ret = ERROR;
 		} else {
 			while (true) {
-				if (SUCCESS != m_child->next(row)) {
+				if (SUCCESS != (ret = m_child->next(row)) ) {
+					if( END != ret ) ctx->setErrorCode(ret);
 					break;
 				} else {
 
@@ -50,6 +52,9 @@ int32_t InsertExecutor::open() {
 			}
 		}
 	}
+
+	if( END == ret ) ret = SUCCESS;
+
 	return ret;
 }
 

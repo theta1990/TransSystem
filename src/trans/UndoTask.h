@@ -32,7 +32,7 @@ public:
 	virtual ~UndoTask();
 
 private:
-
+	UndoTask();
 	RowValue *m_value;
 	int8_t m_flag;
 	int32_t	m_len;

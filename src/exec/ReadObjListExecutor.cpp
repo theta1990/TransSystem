@@ -38,17 +38,24 @@ int32_t ReadObjListExecutor::next(const Row *&row) {
 	for(i = 0; i < m_desc->getColCnt() && m_pos < m_objList.size(); ++i, ++m_pos){
 
 		if( m_desc->getRowtype(i) != m_objList[m_pos].getType() ){
-			ret = ERROR;
+
+			VOLT_DEBUG("Input type %d does not match the schema %d", m_objList[m_pos].getType(), m_desc->getRowtype(i));
+			ret = ERROR;		//input now match the schema
 			break;
 		}
 		m_curRow->setCol(i, m_objList[m_pos]);
 	}
-	if( i != m_desc->getColCnt() ){
-		ret = END;	//reach end of the obj list
-	}
+
+
 	if( SUCCESS == ret ) {
 
-		row = m_curRow;
+		if( i != m_desc->getColCnt() ){
+
+			ret = END;
+		}else {
+
+			row = m_curRow;
+		}
 	}
 	return ret;
 }

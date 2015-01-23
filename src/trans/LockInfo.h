@@ -59,8 +59,10 @@ public:
 
 	virtual int32_t callback() {
 
-		if ( SUCCESS == m_value->m_lock.unlock())
+		if ( SUCCESS == m_value->m_lock.unlock()){
+			VOLT_DEBUG("Unlock[0x%p], state: %d", m_value, m_value->m_lock.getValue());
 			return SUCCESS;
+		}
 		else
 			return ERROR;
 	}

@@ -48,6 +48,7 @@ private:
 	RowKey m_key;		//key
 	const RowTable *m_table;
 	Row		m_row;
+	uint32_t m_pos;
 };
 
 } /* namespace expdb */

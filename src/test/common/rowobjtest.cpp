@@ -24,7 +24,10 @@ int rowobjtest(int argc, char **argv) {
 
 	obj = RowObj::op(MIN, obj, arg);
 	obj.dump();
+
+	obj.setString("hello", 10);
+
 	return 0;
 }
-//TEST(rowobjtest);
+TEST(rowobjtest);
 

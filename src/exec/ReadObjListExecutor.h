@@ -48,7 +48,7 @@ private:
 	std::vector<RowObj> m_objList;
 	const RowDesc *m_desc;
 	Row m_curRow[1];
-	int64_t	m_pos;
+	uint64_t	m_pos;
 };
 
 } /* namespace expdb */

@@ -35,8 +35,8 @@ int32_t TaskContext::rollback() {
 	int32_t ret = SUCCESS;
 	m_rollback = true;
 	VOLT_INFO("roll back trans: %d", m_transId);
-	for(uint32_t i = 0;i<m_undoTaskList.size();++i){
-		if( SUCCESS != m_undoTaskList[i].undo()) {
+	for (uint32_t i = 0; i < m_undoTaskList.size(); ++i) {
+		if (SUCCESS != m_undoTaskList[i].undo()) {
 			VOLT_ERROR("ops, undo failure, what is impossible!!");
 		}
 	}
@@ -62,14 +62,14 @@ int32_t TaskContext::postProcess() {
 
 	int32_t ret = SUCCESS;
 
-	if (!m_rollback) {
+//	if (!m_rollback) {
 
-		for (uint32_t i = 0; i < m_cbTaskList.size(); ++i) {
-			if (SUCCESS != m_cbTaskList[i].callback()) {
-				VOLT_DEBUG("post process, unlock failed");
-			}
+	for (uint32_t i = 0; i < m_cbTaskList.size(); ++i) {
+		if (SUCCESS != m_cbTaskList[i].callback()) {
+			VOLT_DEBUG("post process, unlock failed");
 		}
 	}
+//	}
 	return ret;
 }
 

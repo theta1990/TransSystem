@@ -23,9 +23,9 @@ int32_t UndoTask::undo() {
 
 UndoTask::~UndoTask() {
 
-	if( m_oldValue != NULL ){
-		VOLT_WARN("Memory leak here");
-	}
+//	if( m_oldValue != NULL ){
+//		VOLT_WARN("Memory leak here");
+//	}
 }
 
 Logger::Logger(Allocator &alloc, std::vector<UndoTask> &taskList) :

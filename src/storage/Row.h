@@ -13,11 +13,27 @@
 #include "../common/murmur_hash.h"
 namespace expdb {
 
+/**
+ * 这种组合Key的方式不好，直接导致在索引结构中，Key的空间变大了很多。我觉得可以考虑将Key也序列化，然后在索引结构中存储
+ */
 struct RowKey{
 
 	int8_t m_size;
 	RowObj m_keys[8];
 
+	RowKey() : m_size(0) {
+
+	}
+
+	int32_t addKey(RowObj obj){
+
+		if( m_size < 8 ) {
+			m_keys[m_size++] = obj;
+			return SUCCESS;
+		}else {
+			return ERROR;
+		}
+	}
 
 	uint64_t hash() const {
 
@@ -52,7 +68,7 @@ public:
 
 	void setDesc(const RowDesc *desc);
 //	void addCol(RowObj obj);
-	void addCol(RowObj obj, int colId);
+	void addCol(RowObj& obj, int colId);
 	int32_t getCol(int32_t colId, RowObj &obj) const;
 	int32_t setCol(int32_t colId, const RowObj &obj);
 	void dump() const;

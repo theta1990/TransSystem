@@ -71,8 +71,16 @@ int Row::serilization(char* buf, const int64_t buf_len, int64_t& pos) const {
 			case BIGINT:
 				expdb::encode_i64(buf, buf_len, pos, m_col[i].m_value.bigint);
 				break;
-			case CHAR:
-				expdb::encode_i8(buf, buf_len, pos, m_col[i].m_value.cvalue);
+			case STR:
+
+				if (m_col[i].m_value.str != NULL) {		//这里可能有bug
+
+					expdb::encode_str_fix(buf, buf_len, pos,
+							m_col[i].m_value.str->m_str,
+							m_col[i].m_value.str->m_size);
+				} else {
+					VOLT_ERROR("Object has a null pointer for str");
+				}
 				break;
 			case BVALUE:
 				expdb::encode_bool(buf, buf_len, pos, m_col[i].m_value.bvalue);
@@ -85,9 +93,9 @@ int Row::serilization(char* buf, const int64_t buf_len, int64_t& pos) const {
 	return ret;
 }
 
-void Row::addCol(RowObj obj, int colId) {
+void Row::addCol(RowObj& obj, int colId) {
 
-	assert(colId < m_desc->getColCnt());
+	assert(static_cast<uint32_t>(colId) < m_desc->getColCnt());
 	m_col[colId] = obj;
 }
 
@@ -128,7 +136,7 @@ bool Row::assign(const Row &obj){
 int32_t Row::getCol(int32_t colId, RowObj &obj) const {
 
 	int32_t ret = SUCCESS;
-	if (colId >= m_desc->getColCnt()) {
+	if ( static_cast<uint32_t>(colId) >= m_desc->getColCnt()) {
 
 		VOLT_DEBUG("col id out of range, %d", colId);
 		ret = ERROR;
@@ -143,7 +151,7 @@ int32_t Row::setCol(int32_t colId, const RowObj &obj) {
 
 	int32_t ret = SUCCESS;
 
-	if (colId >= m_desc->getColCnt()) {
+	if (static_cast<uint32_t>(colId) >= m_desc->getColCnt()) {
 
 		VOLT_DEBUG("col id out of range, %d", colId);
 		ret = ERROR;
@@ -180,14 +188,16 @@ int Row::deserilization(const char* buf, const int64_t buf_len, int64_t& pos) {
 				ret = expdb::decode_i64(buf, buf_len, pos,
 						(int64_t *) (&m_col[i].m_value.bigint));
 				break;
-			case CHAR:
-				ret = expdb::decode_i8(buf, buf_len, pos,
-						(int8_t*) (&m_col[i].m_value.cvalue));
+			case STR:
+
+				m_col[i].allocForString(m_desc->getColLen(i));
+				ret = expdb::decode_str_fix(buf, buf_len, pos, m_col[i].m_value.str->m_str, m_col[i].m_value.str->m_size);
 				break;
 			case BVALUE:
 				ret = expdb::decode_bool(buf, buf_len, pos,
 						&m_col[i].m_value.bvalue);
 				break;
+
 			default:
 				break;
 			}

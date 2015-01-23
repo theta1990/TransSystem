@@ -10,7 +10,7 @@
 namespace expdb {
 
 IndexScanExecutor::IndexScanExecutor() :
-		m_key(), m_table(NULL) {
+		m_key(), m_table(NULL), m_pos(0) {
 
 }
 
@@ -33,19 +33,24 @@ int32_t IndexScanExecutor::next(const Row *&nextRow) {
 
 	int32_t ret = SUCCESS;
 
-	if (SUCCESS != (ret = const_cast<RowTable*>(m_table)->get(m_key, m_row))) {
+	if (m_pos == 0) {
 
-		VOLT_DEBUG("Does not find key in the table, %d", ret);
-		ret = END;
+		if (SUCCESS
+				!= (ret = const_cast<RowTable*>(m_table)->get(m_key, m_row))) {
+
+			VOLT_DEBUG("Does not find key in the table, %d", ret);
+			ret = END;
+		} else {
+			nextRow = &m_row;
+		}
+		++m_pos;
 	} else {
-		nextRow = &m_row;
+		ret = END;
 	}
-
 	return ret;
 }
 
-int32_t IndexScanExecutor::close(){
-	int32_t ret = SUCCESS;
+int32_t IndexScanExecutor::close() {
 
 	return SUCCESS;
 }

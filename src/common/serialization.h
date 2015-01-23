@@ -152,6 +152,34 @@ inline int decode_bool(const char *buf, const int64_t buf_len, int64_t& pos,
 	return ret;
 }
 
+inline int encode_str_fix(char *buf, const int64_t buf_len, int64_t &pos, const char *str, int32_t size){
+
+	int ret =
+			((NULL != buf)
+					&& ((buf_len - pos) >= static_cast<int64_t>(size))) ?
+					SUCCESS : ERROR;
+	if( SUCCESS == ret ) {
+		for (int32_t i = 0; i < size; ++i) {
+
+			*(buf + pos++) = str[i];
+		}
+	}
+	return ret;
+}
+
+inline int decode_str_fix(const char * buf, const int64_t data_len, int64_t& pos, char *str, int32_t size){
+
+	int ret = (NULL != buf && data_len - pos >= static_cast<int64_t>(size)) ? SUCCESS : ERROR;
+
+	if( SUCCESS == ret ){
+		for(int32_t i = 0;i<size; ++i){
+			str[i] = *(buf + pos++);
+		}
+	}
+
+	return ret;
+}
+
 }
 
 #endif /* SERIALIZATION_H_ */
