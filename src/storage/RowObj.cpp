@@ -45,6 +45,10 @@ RowObj::RowObj(bool bo) :
 	m_value.bvalue = bo;
 }
 
+RowObj::RowObj(const char *str, int32_t len) : m_type(SMALLINT){
+	setString(str, len);
+}
+
 RowObj::~RowObj() {
 
 	if (m_type == STR) {

@@ -15,6 +15,7 @@ void createAccountTable() {
 	const RowDesc *storedDesc;
 	int32_t id;
 	desc.addRowType(MIDINT);
+	desc.addRowType(STR, 10);
 	desc.addRowType(MIDINT);
 	int32_t priIdx[8];
 
@@ -83,7 +84,7 @@ void genAddAccountTask(TransTask &task, char *inputValues, int32_t sz) {
 	task.addPhyPlan(plan);
 }
 
-void genAddAccouttask(TransTask &task, uint32_t id, uint32_t money) {
+void genAddAccouttask(TransTask &task, uint32_t id, const char *str, uint32_t money) {
 
 	PhyPlan *plan;
 	RowTable *table;
@@ -93,6 +94,7 @@ void genAddAccouttask(TransTask &task, uint32_t id, uint32_t money) {
 
 	std::vector<RowObj> objList;
 	objList.push_back(RowObj(id));
+	objList.push_back(RowObj(str, 10));
 	objList.push_back(RowObj(money));
 	if( SUCCESS ==  PhyPlanFactory::getInstance()->genInsertPlan(plan, objList, table) ) {
 		task.addPhyPlan(plan);
@@ -151,13 +153,13 @@ int startGenerator(int argc, char **argv) {
 	TransTask task;
 	int32_t count = 0 ;
 	MyServer server;
-	server.startServer();
+//	server.startServer();
 
 	for (i = 0; i < 10000; ++i) {
 		task.clear();
 		task.setTranId(count++);
-		genAddAccouttask(task, i, 1000);
-		server.handleTask(task);
+		genAddAccouttask(task, i,"rand" , 1000);
+//		server.handleTask(task);
 	}
 //	task.destroy();
 
@@ -174,5 +176,5 @@ int startGenerator(int argc, char **argv) {
 
 	return 0;
 }
-//TEST(startGenerator);
+TEST(startGenerator);
 

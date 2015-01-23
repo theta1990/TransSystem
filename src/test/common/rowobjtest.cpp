@@ -6,6 +6,7 @@
  */
 #include "test.h"
 #include "../../storage/RowObj.h"
+#include <vector>
 
 using namespace expdb;
 int rowobjtest(int argc, char **argv) {
@@ -17,17 +18,35 @@ int rowobjtest(int argc, char **argv) {
 	arg.setBigInt(20);
 
 	obj = RowObj::op(ADD, obj, arg);
-	obj.dump();
+//	obj.dump();
 
 	obj = RowObj::op(ASSI, obj, arg);
-	obj.dump();
+//	obj.dump();
 
 	obj = RowObj::op(MIN, obj, arg);
-	obj.dump();
+//	obj.dump();
 
 	obj.setString("hello", 10);
 
+	obj.dump();
+	printf("\n");
+	arg = obj;
+	obj.clear();
+	arg.dump();
+	printf("\n");
+
+	RowObj obj2(arg);
+
+	obj2.dump();
+
+	std::vector<RowObj> list;
+	list.push_back(RowObj("rand", 10));
+	list.push_back(RowObj("rand", 10));
+	list.push_back(RowObj("rand", 10));
+	list.push_back(RowObj("rand", 10));
+
+	list.clear();
 	return 0;
 }
-TEST(rowobjtest);
+//TEST(rowobjtest);
 

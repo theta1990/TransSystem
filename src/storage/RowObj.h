@@ -48,6 +48,7 @@ public:
 	RowObj(uint64_t bi);
 	RowObj(char ch);
 	RowObj(bool bo);
+	RowObj(const char *str, int32_t len);
 
 	virtual ~RowObj();
 	uint64_t hash() const;
@@ -55,7 +56,6 @@ public:
 	inline void setSmallInt(uint16_t value);
 	inline void setMidInt(uint32_t value);
 	inline void setBigInt(uint64_t value);
-	inline void setChar(char value);
 	inline void setBool(bool value);
 	inline uint16_t getSmallInt();
 	inline uint32_t getMidInt();
@@ -68,27 +68,32 @@ public:
 
 		if( m_type == STR && m_value.str != NULL ){
 			free(m_value.str);
+			m_value.str = NULL;
 		}
+		m_type = BIGINT;
+		m_value.bigint = 0;
 	}
 
 	int32_t allocForString(int32_t length) {
 
 		int32_t ret = SUCCESS;
 
-		clear();
 		if( length <= 0 ) {
 			ret = ERROR;
 			VOLT_ERROR("Can not set the string length to 0");
 		}
 
 		if( SUCCESS == ret ){
+			clear();
 			m_value.str = (CharFixLen *)malloc(length + sizeof(CharFixLen));
 			m_value.str->m_size = length;
+			m_type = STR;
 		}
 		return ret;
 	}
 
-	RowObj(const RowObj &obj){
+	RowObj(const RowObj &obj) : m_type(SMALLINT){
+
 		assign(obj);
 	}
 	const RowObj & operator = (const RowObj &obj){
@@ -253,14 +258,16 @@ void RowObj::setBool(bool value) {
 
 void RowObj::setString(const char *str, int32_t length) {
 
-	clear();
-	allocForString(length);
 	if( strlen(str) >= static_cast<uint32_t>(length) ) {
 		VOLT_ERROR("RowObj, string length out of bound");
 	}else {
-		strcpy(m_value.str->m_str, str);
-		for(uint32_t i = strlen(str); i < static_cast<uint32_t>(length); ++i){
-			m_value.str->m_str[i] = '\0';
+		clear();
+		if( SUCCESS == allocForString(length) ) {
+
+			strcpy(m_value.str->m_str, str);
+			for(uint32_t i = strlen(str); i < static_cast<uint32_t>(length); ++i){
+				m_value.str->m_str[i] = '\0';
+			}
 		}
 	}
 }
