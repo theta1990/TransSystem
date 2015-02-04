@@ -94,7 +94,7 @@ int32_t PhyPlanFactory::genInsertPlan(PhyPlan *&plan, char *inputValues,
 }
 
 int32_t PhyPlanFactory::genInsertPlan(PhyPlan *&plan,
-		std::vector<RowObj> objList, RowTable *table) {
+		std::vector<RowObj> &objList, RowTable *table) {
 
 	int32_t ret = SUCCESS;
 
@@ -306,7 +306,7 @@ int32_t PhyPlanFactory::genInsertPlan(PhyPlan*& plan, char* inputValues,
 }
 
 int32_t PhyPlanFactory::genInsertPlan(PhyPlan*& plan,
-		std::vector<RowObj> objList, int32_t tableId) {
+		std::vector<RowObj> &objList, int32_t tableId) {
 
 	RowTable *table = NULL;
 	if (TableMgr::getInstance()->getTable(tableId, table) == SUCCESS) {

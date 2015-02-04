@@ -234,7 +234,7 @@ int32_t RowTable::get(const RowKey key, Row& ref) {
 	if (ERROR == (ret = m_priIndex.find(key, value))) {
 		VOLT_ERROR("Primary Index error");
 	} else if (NOTFOUND == ret || value->isDelete()) {
-		VOLT_WARN("Row not found");
+		VOLT_WARN("Row not found, %d, row: %s", ret, key.toString().c_str());
 		ret = NOTFOUND;
 //		key.dump();
 	} else {

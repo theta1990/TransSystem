@@ -80,6 +80,47 @@ private:
 	unsigned int m_tranId;	//事务号
 };
 
+
+typedef int32_t (*parser)(TransTask &task, RowObj* objList, uint32_t size);
+class RawTask{
+public:
+	int32_t parse(TransTask &task){
+		if( NULL == m_parser ) {
+			VOLT_WARN("task parser is not specified");
+			return ERROR;
+		}else {
+			return m_parser(task, m_objList, m_size);
+		}
+	}
+
+	RawTask() : m_parser(NULL), m_objList(NULL), m_size(0){
+
+	}
+
+	RawTask(parser parser_, RowObj *objList, uint32_t size) :
+			m_parser(parser_), m_objList(objList), m_size(size) {
+
+	}
+
+	RawTask(const RawTask &obj){
+		m_parser = obj.m_parser;
+		m_objList = obj.m_objList;
+		m_size = obj.m_size;
+	}
+
+	void destroy(){
+		if( m_objList != NULL ) {
+			free(m_objList);
+			m_objList = NULL;
+			m_size = 0;
+		}
+	}
+private:
+	parser m_parser;
+	RowObj *m_objList;
+	uint32_t m_size;
+};
+
 } /* namespace expdb */
 
 #endif /* TRANSTASK_H_ */

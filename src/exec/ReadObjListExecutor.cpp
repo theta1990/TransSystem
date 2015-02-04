@@ -88,7 +88,7 @@ int32_t ReadObjListExecutor::addObjList(RowObj *list, int32_t size) {
 	return ret;
 }
 
-int32_t ReadObjListExecutor::addObjList(std::vector<RowObj> list) {
+int32_t ReadObjListExecutor::addObjList(std::vector<RowObj>& list) {
 
 	int32_t ret = SUCCESS;
 

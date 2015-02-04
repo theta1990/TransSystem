@@ -11,6 +11,7 @@
 #include "RowObj.h"
 #include "RowDesc.h"
 #include "../common/murmur_hash.h"
+#include <string>
 namespace expdb {
 
 /**
@@ -54,6 +55,17 @@ struct RowKey{
 			}
 		}
 		return ret;
+	}
+
+	std::string toString() const {
+		std::string str;
+		str.append("( ");
+		for (int8_t i = 0; i < m_size; ++i) {
+			str.append(m_keys[i].toString());
+			i != m_size - 1 ? str.append(", ") : str.append("");
+		}
+		str.append(" )");
+		return str;
 	}
 
 };

@@ -43,13 +43,13 @@ int32_t expdb::QLock::try_lock() {
 int32_t expdb::QLock::lock() {
 
 	int32_t ret = SUCCESS;
-	uint64_t beginTime = getCycleCount();
+	uint64_t beginTime = common::getCycleCount();
 	while( true ) {
 
 		if( 0 == atomic::atomic_compare_exchange(&m_lock, 1, 0) ){
 			m_owner = getpid();
 			break;
-		}else if( getCycleCount() - beginTime > m_TIMEOUT ){
+		}else if( common::getCycleCount() - beginTime > m_TIMEOUT ){
 
 			ret = ERROR;
 			break;

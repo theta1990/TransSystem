@@ -45,6 +45,10 @@ RowObj::RowObj(bool bo) :
 	m_value.bvalue = bo;
 }
 
+RowObj::RowObj(double d) : m_type(DOUBLE) {
+	m_value.dval = d;
+}
+
 RowObj::RowObj(const char *str, int32_t len) : m_type(SMALLINT){
 	setString(str, len);
 }
@@ -79,6 +83,9 @@ uint64_t RowObj::hash() const {
 		break;
 	case BVALUE:
 		ret = tools::murmurhash64A(&m_value.bvalue, sizeof(bool), 0);
+		break;
+	case DOUBLE:
+		ret = tools::murmurhash64A(&m_value.dval, sizeof(double), 0);
 		break;
 	default:
 		ret = 0;
@@ -139,6 +146,9 @@ bool RowObj::operator >(const RowObj& obj) const {
 	case BVALUE:
 		ret = m_value.bvalue > obj.m_value.bvalue;
 		break;
+	case DOUBLE:
+		ret = m_value.dval > obj.m_value.dval;
+		break;
 	default:
 		break;
 	}
@@ -168,6 +178,9 @@ bool RowObj::operator ==(const RowObj &obj) const {
 	case BVALUE:
 		ret = m_value.bvalue == obj.m_value.bvalue;
 		break;
+	case DOUBLE:
+		ret = m_value.dval == obj.m_value.dval;
+		break;
 	default:
 		break;
 	}
@@ -194,6 +207,9 @@ void RowObj::dump() const {
 		break;
 	case BVALUE:
 		printf("bool: %d", m_value.bvalue);
+		break;
+	case DOUBLE:
+		printf("double: %lf", m_value.dval);
 		break;
 	default:
 		break;
@@ -269,6 +285,9 @@ uint32_t RowObj::getSize(RowType type){
 		break;
 	case BVALUE:
 		ret = sizeof(bool);
+		break;
+	case DOUBLE:
+		ret = sizeof(double);
 		break;
 	default:
 		break;

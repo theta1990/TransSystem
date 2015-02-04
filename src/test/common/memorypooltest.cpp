@@ -28,7 +28,7 @@ void *memoryThread(void *arg) {
 			sizeList[i] = rand() % 256;
 		}
 
-		begin = getCycleCount();
+		begin = common::getCycleCount();
 
 		for (uint32_t i = 0; i < iter; ++i) {
 
@@ -37,7 +37,7 @@ void *memoryThread(void *arg) {
 			store[i] = p;
 		}
 
-		end = getCycleCount();
+		end = common::getCycleCount();
 
 		for (uint32_t i = 0; i < iter; ++i) {
 			free(store[i]);

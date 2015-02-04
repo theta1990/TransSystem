@@ -85,6 +85,9 @@ int Row::serilization(char* buf, const int64_t buf_len, int64_t& pos) const {
 			case BVALUE:
 				expdb::encode_bool(buf, buf_len, pos, m_col[i].m_value.bvalue);
 				break;
+			case DOUBLE:
+				expdb::encode_i64(buf, buf_len, pos, m_col[i].m_value.bigint);
+				break;
 			default:
 				break;
 			}
@@ -197,7 +200,10 @@ int Row::deserilization(const char* buf, const int64_t buf_len, int64_t& pos) {
 				ret = expdb::decode_bool(buf, buf_len, pos,
 						&m_col[i].m_value.bvalue);
 				break;
-
+			case DOUBLE:
+				ret = expdb::decode_i64(buf, buf_len, pos,
+						(int64_t *)(&m_col[i].m_value.bigint));
+				break;
 			default:
 				break;
 			}

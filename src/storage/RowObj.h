@@ -12,10 +12,11 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <string>
 namespace expdb {
 
 enum RowType {
-	SMALLINT = 0, MIDINT = 1, BIGINT = 2, STR = 3, BVALUE = 4
+	SMALLINT = 0, MIDINT = 1, BIGINT = 2, STR = 3, BVALUE = 4, DOUBLE = 5
 };
 
 enum OpType {
@@ -39,6 +40,7 @@ struct CharFixLen{
 	char	m_str[0];
 };
 
+
 class RowObj {
 public:
 	RowObj();
@@ -48,8 +50,8 @@ public:
 	RowObj(uint64_t bi);
 	RowObj(char ch);
 	RowObj(bool bo);
+	RowObj(double d);
 	RowObj(const char *str, int32_t len);
-
 	virtual ~RowObj();
 	uint64_t hash() const;
 
@@ -57,16 +59,18 @@ public:
 	inline void setMidInt(uint32_t value);
 	inline void setBigInt(uint64_t value);
 	inline void setBool(bool value);
+	inline void setDouble(double value);
 	inline uint16_t getSmallInt();
 	inline uint32_t getMidInt();
 	inline uint64_t getBigInt();
 	inline bool getbool();
 
 	inline void setString(const char *str, int32_t length);
+//	inline void setDecimal(const char *str, int32_t s, int32_t p);
 
 	void clear() {
 
-		if( m_type == STR && m_value.str != NULL ){
+		if( (m_type == STR) && m_value.str != NULL ){
 			free(m_value.str);
 			m_value.str = NULL;
 		}
@@ -112,6 +116,39 @@ public:
 
 	void dump() const;
 
+	std::string toString() const{
+
+		std::string str;
+		char buf[128];
+		switch (m_type) {
+		case SMALLINT:
+			sprintf(buf, "%d[SI]", m_value.smallint);
+			break;
+		case MIDINT:
+			sprintf(buf, "%d[MI]", m_value.midint);
+			break;
+		case BIGINT:
+			sprintf(buf, "%ld[BI]", m_value.bigint);
+			break;
+		case STR:
+			if (m_value.str->m_str == NULL)
+				sprintf(buf, "<nil>[CH]");
+			else
+				sprintf(buf,"%s[CH]", m_value.str->m_str);
+			break;
+		case BVALUE:
+			sprintf(buf, "%d[BO]", m_value.bvalue);
+			break;
+		case DOUBLE:
+			sprintf(buf, "%lf[DLE]", m_value.dval);
+			break;
+		default:
+			break;
+		}
+		str.append(buf);
+		return str;
+	}
+
 //	void serilization(char *buf, const int64_t buf_len, int64_t &pos);
 //	void deserilization(const char *buf, const int64_t buf_len, int64_t &pos);
 
@@ -121,7 +158,7 @@ public:
 	struct Add {
 		const RowObj operator()(const RowObj &a, const RowObj &b) {
 
-			RowObj obj(a);
+			RowObj obj(a);		//理论上应该验证类型是不是相同吧
 			switch (a.m_type) {
 			case SMALLINT:
 				obj.m_value.smallint += b.m_value.smallint;
@@ -137,6 +174,9 @@ public:
 				break;
 			case BVALUE:
 				obj.m_value.bvalue = obj.m_value.bvalue || b.m_value.bvalue;
+				break;
+			case DOUBLE:
+				obj.m_value.dval = obj.m_value.dval + b.m_value.dval;
 				break;
 			default:
 				VOLT_ERROR("not supported data type")
@@ -173,6 +213,9 @@ public:
 				break;
 			case BVALUE:
 				obj.m_value.bvalue = obj.m_value.bvalue || b.m_value.bvalue;
+				break;
+			case DOUBLE:
+				obj.m_value.dval = obj.m_value.dval - b.m_value.dval;
 				break;
 			default:
 				VOLT_ERROR("not supported data type")
@@ -228,6 +271,7 @@ private:
 		uint32_t midint;
 		uint64_t bigint;
 		bool bvalue;
+		double	dval;
 		CharFixLen	*str;
 	} m_value;
 };
@@ -254,6 +298,12 @@ void RowObj::setBool(bool value) {
 
 	m_type = BVALUE;
 	m_value.bvalue = value;
+}
+
+void RowObj::setDouble(double value) {
+
+	m_type = DOUBLE;
+	m_value.dval = value;
 }
 
 void RowObj::setString(const char *str, int32_t length) {

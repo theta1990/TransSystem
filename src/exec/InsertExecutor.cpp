@@ -42,11 +42,11 @@ int32_t InsertExecutor::open() {
 
 					if (SUCCESS != (ret = m_table->insert(*ctx, row))) {
 						VOLT_WARN("insert fails");
-						row->dump();
+//						row->dump();
 						break;
 					}else {
 						VOLT_INFO("insert success");
-						row->dump();
+//						row->dump();
 					}
 				}
 			}

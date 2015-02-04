@@ -40,6 +40,29 @@ int32_t RowDesc::addRowType(RowType type, uint32_t len) {
 	return ret;
 }
 
+int32_t RowDesc::addRowType(RowType type, std::string str, uint32_t len) {
+
+	int32_t ret = SUCCESS;
+
+	if( type == STR ){
+		if( len == 0 ) {
+			VOLT_ERROR("Can not set the length of string to 0");
+			ret = ERROR;
+		}else {
+			m_len[m_colCnt] = len;
+		}
+	}else {
+		m_len[m_colCnt] = RowObj::getSize(type);
+	}
+	if( SUCCESS == ret ){
+		m_totalLen += m_len[m_colCnt];
+		m_colName[m_colCnt] = str;
+		m_type[m_colCnt++] = type;
+	}
+
+	return ret;
+}
+
 
 RowType RowDesc::getRowtype(uint32_t colIdx)const {
 

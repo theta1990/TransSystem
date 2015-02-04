@@ -46,6 +46,18 @@ int rowobjtest(int argc, char **argv) {
 	list.push_back(RowObj("rand", 10));
 
 	list.clear();
+
+	RowObj dd(0.4);
+	RowObj cc(-9.1);
+	RowObj andd = RowObj::op(ADD, dd, cc);
+
+	dd.dump();
+
+	printf("\n");
+
+	andd.dump();
+	printf("\n");
+
 	return 0;
 }
 //TEST(rowobjtest);

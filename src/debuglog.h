@@ -78,7 +78,7 @@
 #define VOLT_LOG_TIME_FORMAT "%Y-%m-%d %H:%M:%S"
 
 //ADDED by ZT
-#define VOLT_LOG_LEVEL VOLT_LEVEL_INFO
+#define VOLT_LOG_LEVEL VOLT_LEVEL_WARN
 
 // Compile Option
 #ifndef VOLT_LOG_LEVEL

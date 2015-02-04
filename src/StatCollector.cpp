@@ -32,7 +32,7 @@ int StatCollector::gather(StatCollector& coll) {
 
 int StatCollector::start() {
 
-	m_startCycle = getCycleCount();
+	m_startCycle = common::getCycleCount();
 	gettimeofday(&m_starTime, NULL);
 
 	return SUCCESS;
@@ -40,7 +40,7 @@ int StatCollector::start() {
 
 int StatCollector::stop() {
 
-	m_stopCycle = getCycleCount();
+	m_stopCycle = common::getCycleCount();
 	gettimeofday(&m_endTime, NULL);
 	return SUCCESS;
 }

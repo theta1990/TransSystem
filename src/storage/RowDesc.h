@@ -18,6 +18,8 @@ public:
 
 	int32_t addRowType(RowType type, uint32_t len = 0);
 
+	int32_t addRowType(RowType type, std::string str, uint32_t len = 0);
+
 	uint32_t getColCnt() const {
 
 		return m_colCnt;
@@ -74,6 +76,7 @@ private:
 	int32_t m_priIdx[8];
 	uint32_t m_colCnt;
 	RowType m_type[1024];
+	std::string m_colName[1024];
 	uint32_t m_len[1024];
 	uint32_t m_totalLen;
 };
