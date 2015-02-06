@@ -6,7 +6,9 @@
  */
 
 #include "StoredProcedure.h"
-
+#include "../exec/Executor.h"
+#include "../exec/PhyPlan.h"
+#include "../exec/PhyPlanFactory.h"
 namespace expdb {
 
 StoredProcedure::StoredProcedure() {

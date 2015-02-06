@@ -9,13 +9,19 @@
 #define STOREDPROCEDURE_H_
 
 #include "../common.h"
+#include "TaskContext.h"
+#include "../storage/RowObj.h"
+#include "../common/memory/Allocator.h"
+
 #define MAXPARAMETERS
 namespace expdb {
 
 class ResultSet {
 
 public:
-	inline void addRow(const Row &row);
+	inline void addRow(const Row &row){
+
+	}
 };
 
 /**
@@ -25,9 +31,8 @@ class StoredProcedure {
 public:
 	StoredProcedure();
 
-	virtual int32_t run(const RowObj *objList, uint32_t size,
+	virtual int32_t run(RowObj *objList, uint32_t size,
 			TaskContext *ctx) = 0;
-	virtual ~StoredProcedure();
 protected:
 
 	/**
@@ -38,17 +43,6 @@ protected:
 	int32_t executePhyPlan(PhyPlan &plan, TaskContext *ctx,
 			ResultSet *&results);
 };
-
-///**
-// * 客户端的请求
-// */
-//class StoredProcedureRequest{
-//public:
-//	StoredProcedureRequest();
-//
-//private:
-//
-//};
 
 /**
  * 工作线程的处理对象
@@ -62,6 +56,7 @@ public:
 
 	int32_t setAlloc(Allocator *alloc) {
 		m_alloc = alloc;
+		return SUCCESS;
 	}
 
 	int32_t getContext(const TaskContext *&ctx) {
@@ -74,11 +69,15 @@ public:
 		}
 	}
 
+	int32_t getTranId() {
+
+		return m_tranId;
+	}
+
 	int32_t destroy() {
 		free(m_objList);
 		return SUCCESS;
 	}
-	~StoredProcedureTask();
 private:
 	RowObj *m_objList;
 	uint32_t m_size;

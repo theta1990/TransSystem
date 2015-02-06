@@ -24,7 +24,7 @@ int32_t MyServer::startServer() {
 
 	for (int i = 0; i < m_count; ++i) {
 
-		m_threadPools[i] = new RawTaskHandler();
+		m_threadPools[i] = new ProcedureHandler();
 		m_threadPools[i]->start();
 	}
 
@@ -47,8 +47,14 @@ int32_t MyServer::handleTask(TransTask task) {
 int32_t MyServer::handleTask(RawTask task){
 
 	int32_t ret = SUCCESS;
-	m_threadPools[rand()%m_count]->push(task);
+//	m_threadPools[rand()%m_count]->push(task);
 	return ret;
+}
+
+int32_t MyServer::handleTask(StoredProcedureTask task){
+
+	m_threadPools[rand()%m_count]->push(task);
+	return SUCCESS;
 }
 
 int32_t MyServer::exit(){

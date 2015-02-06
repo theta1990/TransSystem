@@ -10,6 +10,7 @@
 #include "../../storage/TableMgr.h"
 #include "../../storage/SchemaMgr.h"
 #include "../../common/serialization.h"
+#include "TestProcedure.h"
 using namespace expdb;
 
 #define READTIMES 6
@@ -182,6 +183,9 @@ int hpCCSpTest(int arc, char **argv) {
 	MyServer server;
 	int32_t taskCount = 1000000;
 	RowObj* objList;
+	load();
+	server.startServer();
+
 	for (i = 0; i < RECORDSIZE; ++i) {
 
 		objList = (RowObj*)malloc(sizeof(RowObj) * 2);
@@ -197,7 +201,7 @@ int hpCCSpTest(int arc, char **argv) {
 	long startTimeStamp = common::getTimeOfMs();
 	for (i = 0; i < taskCount; ++i) {
 		genTransactionParameter(objList, size);
-		server.handleTask(StoredProcedureTask(TransferTask::getIntance(), objList, size));
+		server.handleTask(StoredProcedureTask(TransferTask::getInstance(), objList, size));
 	}
 	server.exit();
 	server.waitForExit();
@@ -207,4 +211,5 @@ int hpCCSpTest(int arc, char **argv) {
 
 
 }
+TEST(hpCCSpTest);
 

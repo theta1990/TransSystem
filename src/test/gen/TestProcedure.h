@@ -9,6 +9,12 @@
 #define TESTPROCEDURE_H_
 #include <assert.h>
 #include <stdlib.h>
+#include "../../trans/StoredProcedure.h"
+#include "../../exec/PhyPlanFactory.h"
+#include "../../storage/TableMgr.h"
+#include "../../storage/SchemaMgr.h"
+#include "../../common/serialization.h"
+
 namespace expdb {
 #define READTIMES 6
 #define WRITETIEMS 6
@@ -18,7 +24,7 @@ class AddProcedure : public StoredProcedure {
 public:
 	AddProcedure();
 
-	virtual int32_t run(const RowObj *objList, uint32_t size,
+	virtual int32_t run(RowObj *objList, uint32_t size,
 			TaskContext *ctx) {
 		int32_t ret = SUCCESS;
 
@@ -48,13 +54,7 @@ public:
 		return ret;
 	}
 
-	static StoredProcedure* getInstance() {
-
-		if( _ins == NULL ) {
-			_ins = new AddProcedure();
-		}
-		return _ins;
-	}
+	static StoredProcedure* getInstance();
 
 private:
 	static StoredProcedure *_ins;
@@ -64,7 +64,7 @@ class TransferTask : public StoredProcedure {
 public:
 	TransferTask();
 
-	virtual int32_t run(const RowObj *objList, uint32_t size, TaskContext *ctx){
+	virtual int32_t run(RowObj *objList, uint32_t size, TaskContext *ctx){
 		int32_t ret = SUCCESS;
 
 		PhyPlan *plan;
@@ -107,13 +107,7 @@ public:
 		return ret;
 	}
 
-	static StoredProcedure* getInstance() {
-
-		if( _ins == NULL ) {
-			_ins = new TransferTask();
-		}
-		return _ins;
-	}
+	static StoredProcedure* getInstance() ;
 
 private:
 	static StoredProcedure *_ins;

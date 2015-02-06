@@ -17,6 +17,7 @@ namespace expdb {
 
 class TransExecQueue;
 class RawTaskHandler;
+class ProcedureHandler;
 class StatCollector {
 public:
 	StatCollector();
@@ -29,6 +30,7 @@ public:
 	void report();
 	friend class TransExecQueue;
 	friend class RawTaskHandler;
+	friend class ProcedureHandler;
 private:
 	unsigned long	m_throughput;
 	unsigned long	m_rollback;
