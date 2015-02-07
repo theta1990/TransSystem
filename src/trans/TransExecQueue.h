@@ -12,7 +12,7 @@
 #include "TransTask.h"
 #include "LockMgr.h"
 #include "../common/memory/Allocator.h"
-#include "../StatCollector.h"
+#include "../stat/StatCollector.h"
 //#include <queue>
 #include <boost/lockfree/queue.hpp>
 #include <boost/atomic/atomic.hpp>

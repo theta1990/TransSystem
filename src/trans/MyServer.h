@@ -25,6 +25,8 @@ public:
 	int32_t handleTask(StoredProcedureTask task);
 	int32_t exit();
 	int32_t waitForExit();
+
+
 private:
 
 //	TransExecQueue*	m_threadPools[MaxWorkerThread];
@@ -32,6 +34,17 @@ private:
 	ProcedureHandler *m_threadPools[MaxWorkerThread];
 	int32_t			m_count;
 	Allocator		m_alloc;
+
+	void report() {
+
+		StatCollector stat;
+		stat.start();
+		for(int threadidx = 0; threadidx < m_count; ++threadidx){
+			stat.gather(m_threadPools[threadidx]->getStat());
+		}
+		stat.report();
+	}
+
 };
 
 } /* namespace expdb */

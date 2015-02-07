@@ -12,7 +12,7 @@
 #include "TaskContext.h"
 #include "../storage/RowObj.h"
 #include "../common/memory/Allocator.h"
-
+#include <string>
 #define MAXPARAMETERS
 namespace expdb {
 
@@ -33,6 +33,8 @@ public:
 
 	virtual int32_t run(RowObj *objList, uint32_t size,
 			TaskContext *ctx) = 0;
+
+	virtual std::string getProcedureName() const = 0;
 protected:
 
 	/**
@@ -77,6 +79,10 @@ public:
 	int32_t destroy() {
 		free(m_objList);
 		return SUCCESS;
+	}
+
+	std::string getProcedureName() const {
+		return m_spRef->getProcedureName();
 	}
 private:
 	RowObj *m_objList;

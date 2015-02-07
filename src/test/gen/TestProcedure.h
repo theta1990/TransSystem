@@ -54,6 +54,10 @@ public:
 		return ret;
 	}
 
+	virtual std::string getProcedureName() const {
+		return "Add";
+	}
+
 	static StoredProcedure* getInstance();
 
 private:
@@ -105,6 +109,10 @@ public:
 		}
 
 		return ret;
+	}
+
+	virtual std::string getProcedureName() const {
+		return "Transfer";
 	}
 
 	static StoredProcedure* getInstance() ;

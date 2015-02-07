@@ -73,6 +73,7 @@ int32_t MyServer::waitForExit() {
 		m_threadPools[i]->join();
 	}
 
+	report();
 	return ret;
 }
 

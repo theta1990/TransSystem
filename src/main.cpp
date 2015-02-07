@@ -11,7 +11,6 @@
 #include "common.h"
 #include "debuglog.h"
 #include "clock.h"
-#include "StatCollector.h"
 #include "Configure.h"
 using namespace std;
 

@@ -196,7 +196,8 @@ int hpCCSpTest(int arc, char **argv) {
 	}
 
 	printf("-Load data finished\n");
-	sleep(10);
+//	sleep(10);
+	sleep(1);
 
 	long startTimeStamp = common::getTimeOfMs();
 	for (i = 0; i < taskCount; ++i) {

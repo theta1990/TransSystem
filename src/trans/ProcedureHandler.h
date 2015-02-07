@@ -11,7 +11,7 @@
 #include "TaskQueue.h"
 #include "LockMgr.h"
 #include "../common/memory/Allocator.h"
-#include "../StatCollector.h"
+#include "../stat/StatCollector.h"
 #include "StoredProcedure.h"
 #include <boost/lockfree/queue.hpp>
 #include <boost/atomic/atomic.hpp>
@@ -23,7 +23,9 @@ class ProcedureHandler : public TaskQueue {
 public:
 	ProcedureHandler();
 	virtual ~ProcedureHandler();
-	StatCollector & getStat();
+	StatCollector & getStat() {
+		return m_stat;
+	}
 	int push(StoredProcedureTask &spTask);
 	virtual void work();
 	virtual int handleTask(StoredProcedureTask &spTask);

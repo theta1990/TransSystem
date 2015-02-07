@@ -34,17 +34,18 @@ void ProcedureHandler::work() {
 
 		while (m_queue.pop(task)) {
 			//process the task here
-			if (TRAN_FINISHED == handleTask(task))
-				m_stat.m_throughput++;
+//			if (TRAN_FINISHED == handleTask(task))
+//				m_stat.m_throughput++;
+			handleTask(task);
 		}
 
 	}
 
 	while (m_queue.pop(task)) {
 		//process the task here
-		if (TRAN_FINISHED == handleTask(task))
-			m_stat.m_throughput++;
-
+//		if (TRAN_FINISHED == handleTask(task))
+//			m_stat.m_throughput++;
+		handleTask(task);
 	}
 
 	m_stat.stop();
@@ -64,15 +65,18 @@ int ProcedureHandler::handleTask(StoredProcedureTask& task) {
 		if (SUCCESS == rc) { //transaction successfully processed
 
 			VOLT_INFO("Successfully handle trans %d", task.getTranId());
+			m_stat.incTaskCount(task.getProcedureName());
 			task.destroy();
 		} else if (LOCK_CONFLICT == rc) {
 
 			VOLT_WARN("Trans[%d] failed due to lock conflict", task.getTranId());
+			m_stat.incRetryTaskCount(task.getProcedureName());
 			task.destroy();
 			m_queue.push(task);
 		} else {	//re-process the transaction
 
 			VOLT_WARN("Trans failed due to error[%d]", rc);
+			m_stat.incRetryTaskCount(task.getProcedureName());
 			task.destroy();
 		}
 	}
@@ -89,3 +93,4 @@ ProcedureHandler::~ProcedureHandler() {
 }
 
 } /* namespace expdb */
+;
