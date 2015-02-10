@@ -112,6 +112,8 @@ private:
 	Logger* m_logger;
 	int32_t m_transId;
 	bool m_rollback;
+	//记录了导致事务出错的逻辑原因，例如数据不存在，违反一致性约束，取锁失败等
+	//和函数的执行返回不相同。
 	int32_t m_retCode;
 };
 

@@ -18,7 +18,7 @@
 namespace expdb {
 #define READTIMES 6
 #define WRITETIEMS 6
-#define RECORDSIZE 1000000
+#define RECORDSIZE 20
 
 class AddProcedure : public StoredProcedure {
 public:
@@ -68,6 +68,9 @@ class TransferTask : public StoredProcedure {
 public:
 	TransferTask();
 
+	/**
+	 * 一旦发生任何形式的执行错误，应该立刻返回
+	 */
 	virtual int32_t run(RowObj *objList, uint32_t size, TaskContext *ctx){
 		int32_t ret = SUCCESS;
 

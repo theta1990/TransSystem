@@ -13,7 +13,7 @@
 namespace expdb {
 
 #define MaxWorkerThread 8
-#define DefaultWorkerThread 8
+#define DefaultWorkerThread 1
 class MyServer {
 public:
 	MyServer();

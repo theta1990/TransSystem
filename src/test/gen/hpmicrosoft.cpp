@@ -15,7 +15,7 @@ using namespace expdb;
 
 #define READTIMES 6
 #define WRITETIEMS 6
-#define RECORDSIZE 1000000
+#define RECORDSIZE 20
 /**
  * Account: name, money
  */
@@ -181,7 +181,7 @@ int hpCCSpTest(int arc, char **argv) {
 	int32_t i = 0;
 	uint32_t size;
 	MyServer server;
-	int32_t taskCount = 1000000;
+	int32_t taskCount = 10;
 	RowObj* objList;
 	load();
 	server.startServer();

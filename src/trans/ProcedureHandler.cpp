@@ -60,26 +60,31 @@ int ProcedureHandler::handleTask(StoredProcedureTask& task) {
 
 	rc = task.run();
 
-	if (rc == SUCCESS) {
+	switch (rc) {
+	case SUCCESS:
 
-		if (SUCCESS == rc) { //transaction successfully processed
+		VOLT_INFO("Successfully handle trans %d", task.getTranId());
+		m_stat.incTaskCount(task.getProcedureName());
+		task.destroy();
+		break;
+	case ERROR:
+	case DBERROR:
 
-			VOLT_INFO("Successfully handle trans %d", task.getTranId());
-			m_stat.incTaskCount(task.getProcedureName());
-			task.destroy();
-		} else if (LOCK_CONFLICT == rc) {
+		VOLT_WARN("Trans failed due to error[%d]", rc);
+		m_stat.incRetryTaskCount(task.getProcedureName());
+		task.destroy();
+		break;
+	case REEXEC:
 
-			VOLT_WARN("Trans[%d] failed due to lock conflict", task.getTranId());
-			m_stat.incRetryTaskCount(task.getProcedureName());
-			task.destroy();
-			m_queue.push(task);
-		} else {	//re-process the transaction
-
-			VOLT_WARN("Trans failed due to error[%d]", rc);
-			m_stat.incRetryTaskCount(task.getProcedureName());
-			task.destroy();
-		}
+		VOLT_WARN("Trans[%d] failed due to lock conflict", task.getTranId());
+		m_stat.incRetryTaskCount(task.getProcedureName());
+		task.destroy();
+		m_queue.push(task);
+		break;
+	default:
+		break;
 	}
+
 	return SUCCESS;
 }
 

@@ -184,10 +184,12 @@ int32_t RowTable::update(TaskContext& ctx, RowKey key, Expression *expr) {
 		ret = ERROR;
 	} else if (SUCCESS != m_priIndex.find(key, value) || value->isDelete()) { //how to ensure the primary index tree won't be modified, tree should be locked.
 		VOLT_WARN("row does not existed");
-		ret = NOT_EXIST;
+		ctx.setErrorCode(CTX_ROW_NOT_EXIST);
+		ret = ERROR;
 	} else if (SUCCESS != lockinfo->writeBegin(value)) {
 		VOLT_WARN("lock failed");
-		ret = LOCK_CONFLICT;;
+		ctx.setErrorCode(CTX_LOCK_CONFLICT);
+		ret = ERROR;;
 	} else {
 
 		if (SUCCESS != (ret = ctx.getLogger(logger))) {
@@ -199,15 +201,14 @@ int32_t RowTable::update(TaskContext& ctx, RowKey key, Expression *expr) {
 			const Row *newRow;
 			int64_t pos = 0;
 			if (SUCCESS
-					== oldRow.deserilization(value->m_value,
-							m_desc->getRowLen(), pos)) {
+					== (ret = oldRow.deserilization(value->m_value,
+							m_desc->getRowLen(), pos))) {
 				expr->cal(&oldRow, newRow);
 				set(value, newRow);
+			}else {
+				VOLT_WARN("Row deserilization failed");
 			}
 		}
-	}
-	if( ret != SUCCESS ) {
-		ctx.setErrorCode(ret);
 	}
 	return ret;
 }
@@ -237,6 +238,24 @@ int32_t RowTable::get(const RowKey key, Row& ref) {
 		VOLT_WARN("Row not found, %d, row: %s", ret, key.toString().c_str());
 		ret = NOTFOUND;
 //		key.dump();
+	} else {
+		int64_t pos = 0;
+		ref.setDesc(m_desc);
+		ref.deserilization(value->m_value, m_desc->getRowLen(), pos);
+	}
+	return ret;
+}
+
+int32_t RowTable::get(TaskContext &ctx, const RowKey key, Row &ref) {
+
+	int32_t ret = SUCCESS;
+	RowValue *value = NULL;
+	if (ERROR == (ret = m_priIndex.find(key, value))) {
+		VOLT_ERROR("Primary Index error");
+	} else if (NOTFOUND == ret || value->isDelete()) {
+		VOLT_WARN("Row not found, %d, row: %s", ret, key.toString().c_str());
+		ctx.setErrorCode(CTX_ROW_NOT_EXIST);
+		ret = ERROR;
 	} else {
 		int64_t pos = 0;
 		ref.setDesc(m_desc);

@@ -31,6 +31,9 @@ class StoredProcedure {
 public:
 	StoredProcedure();
 
+	/**
+	 * 一旦发生任何形式的执行错误，应该立刻返回
+	 */
 	virtual int32_t run(RowObj *objList, uint32_t size,
 			TaskContext *ctx) = 0;
 

@@ -70,6 +70,7 @@ public:
 	int32_t remove(RowKey key);
 
 	int32_t get(const RowKey key, Row &ref);
+	int32_t get(TaskContext &ctx, const RowKey key, Row &ref);
 
 private:
 

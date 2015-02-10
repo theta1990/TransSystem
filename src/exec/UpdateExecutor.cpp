@@ -32,9 +32,9 @@ int32_t UpdateExecutor::open() {
 		VOLT_INFO("child op open failed");
 	} else {
 
-		while (true) {
+		while ( SUCCESS == ret) {
 
-			if (m_childop->next(m_curRow) != END) {
+			if (SUCCESS == (ret = m_childop->next(m_curRow))) {
 //				m_exp->cal(m_curRow, m_curRow);	//calculate the update version
 				RowKey key;
 				m_curRow->getRowKey(key);
@@ -42,18 +42,20 @@ int32_t UpdateExecutor::open() {
 				PhyPlan* plan = getPhyPlan();
 				TaskContext* ctx;
 				if (plan == NULL) {
-					VOLT_WARN("phyical plan is not set");
+					VOLT_WARN("Physical plan is not set");
 					ret = ERROR;
 				} else if ((ctx = plan->getTaskContext()) == NULL) {
-					VOLT_WARN("context is not set");
+					VOLT_WARN("Context is not set");
 					ret = ERROR;
 				} else if (SUCCESS
-						!= (ret = m_table->update(*ctx, key, &m_exp))) {
-					VOLT_WARN("update fail");
+						!= (ret = m_table->update(*ctx, key, &m_exp))) {	//如果一个元素更新失败，后面的数据更新都不会进行
+					VOLT_WARN("Update failed");
 				}
-			} else {
-				break;
 			}
+		}
+
+		if( END == ret ) {
+			ret = SUCCESS;
 		}
 	}
 	return ret;
