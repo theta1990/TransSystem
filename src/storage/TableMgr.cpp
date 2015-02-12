@@ -63,6 +63,7 @@ TableMgr::TableMgr() {
 //	m_flags.clear();
 //	m_tableList.clear();
 //	m_Count = 0;
+	memset(m_flag, 0,sizeof(m_flag));
 	m_lock.reset();
 }
 

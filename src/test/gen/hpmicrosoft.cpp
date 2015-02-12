@@ -13,9 +13,6 @@
 #include "TestProcedure.h"
 using namespace expdb;
 
-#define READTIMES 6
-#define WRITETIEMS 6
-#define RECORDSIZE 20
 /**
  * Account: name, money
  */
@@ -180,8 +177,8 @@ int hpCCSpTest(int arc, char **argv) {
 
 	int32_t i = 0;
 	uint32_t size;
-	MyServer server;
-	int32_t taskCount = 10;
+	MyServer server(Configure::getInstance());
+	int32_t taskCount = 10000;
 	RowObj* objList;
 	load();
 	server.startServer();
@@ -189,7 +186,7 @@ int hpCCSpTest(int arc, char **argv) {
 	for (i = 0; i < RECORDSIZE; ++i) {
 
 		objList = (RowObj*)malloc(sizeof(RowObj) * 2);
-		objList[0] = RowObj(static_cast<uint32_t>(i));
+		objList[0] = RowObj(static_cast<uint32_t>(i));	//这里会不会有问题，objList[0] 实例直接采用赋值产生？连初始化都没有
 		objList[1] = RowObj(static_cast<uint32_t>(1000));
 
 		server.handleTask(StoredProcedureTask(AddProcedure::getInstance(), objList, 2));
@@ -199,18 +196,18 @@ int hpCCSpTest(int arc, char **argv) {
 //	sleep(10);
 	sleep(1);
 
-	long startTimeStamp = common::getTimeOfMs();
+//	long startTimeStamp = common::getTimeOfMs();
 	for (i = 0; i < taskCount; ++i) {
 		genTransactionParameter(objList, size);
 		server.handleTask(StoredProcedureTask(TransferTask::getInstance(), objList, size));
 	}
 	server.exit();
 	server.waitForExit();
-	long endTimeStamp = common::getTimeOfMs();
+//	long endTimeStamp = common::getTimeOfMs();
 
-	printf("-TPS: %ld\n", taskCount / ((endTimeStamp-startTimeStamp) / 1000000));
+//	printf("-TPS: %ld\n", taskCount / ((endTimeStamp-startTimeStamp) / 1000000));
 
-
+	return 0;
 }
 TEST(hpCCSpTest);
 

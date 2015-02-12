@@ -79,8 +79,8 @@ void StatCollector::report() {
 	}
 
 	printf("\n");
-	printf("\t-Throughput: %ld per sec\n",
-			m_throughput / ((m_endms - m_startms) / 1000000));
+	printf("\t-Throughput: %.2lf per sec\n",
+			m_throughput / ((m_endms - m_startms) / 1000000.0));
 
 	printf("============================================\n");
 }

@@ -1,0 +1,2 @@
+thread 1
+dbsize 1000

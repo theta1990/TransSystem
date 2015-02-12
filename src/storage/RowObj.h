@@ -52,7 +52,7 @@ public:
 	RowObj(bool bo);
 	RowObj(double d);
 	RowObj(const char *str, int32_t len);
-	virtual ~RowObj();
+	~RowObj();
 	uint64_t hash() const;
 
 	inline void setSmallInt(uint16_t value);
@@ -239,6 +239,11 @@ public:
 		}
 	};
 
+	void testSizeOf() {
+		printf("%d\n", sizeof(RowType));
+		printf("%d\n", sizeof(m_value));
+	}
+
 	friend class Row;
 private:
 
@@ -265,7 +270,7 @@ private:
 	static Multiple mulfunc;
 	static Divide divfunc;
 
-	RowType m_type;
+	RowType m_type;				//占 4 个字节
 	union {
 		uint16_t smallint;
 		uint32_t midint;
@@ -273,8 +278,9 @@ private:
 		bool bvalue;
 		double	dval;
 		CharFixLen	*str;
-	} m_value;
-};
+	} m_value;					//占 8 个字节
+};		//总共占 16个字节， m_type后面的4个字节没有使用，m_value对齐到了下一个八倍字节处。
+		//如果有 虚 函数，大小还要增加8个字节，类会有一个指针指向虚表。
 
 void RowObj::setSmallInt(uint16_t value) {
 

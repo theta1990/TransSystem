@@ -13,10 +13,11 @@
 namespace expdb {
 
 #define MaxWorkerThread 8
-#define DefaultWorkerThread 1
+#define DefaultWorkerThread 2
 class MyServer {
 public:
 	MyServer();
+	MyServer(Configure *configure);
 	virtual ~MyServer();
 
 	int32_t startServer();
@@ -28,6 +29,7 @@ public:
 
 
 private:
+
 
 //	TransExecQueue*	m_threadPools[MaxWorkerThread];
 //	RawTaskHandler *m_threadPools[MaxWorkerThread];

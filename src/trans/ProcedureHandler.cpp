@@ -78,7 +78,7 @@ int ProcedureHandler::handleTask(StoredProcedureTask& task) {
 
 		VOLT_WARN("Trans[%d] failed due to lock conflict", task.getTranId());
 		m_stat.incRetryTaskCount(task.getProcedureName());
-		task.destroy();
+//		task.destroy();
 		m_queue.push(task);
 		break;
 	default:

@@ -29,7 +29,7 @@ public:
 		return m_lock;
 	}
 
-	pid_t getOwner(){
+	pthread_t getOwner(){
 		return m_owner;
 	}
 
@@ -38,7 +38,7 @@ public:
 private:
 
 	volatile uint8_t	m_lock;
-	pid_t		m_owner;
+	pthread_t		m_owner;
 	const static uint64_t m_TIMEOUT = 1000;
 };
 

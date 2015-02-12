@@ -6,11 +6,15 @@
  */
 
 #include "MyServer.h"
-
+#include "TransIdGenerator.h"
 namespace expdb {
 
 MyServer::MyServer() :
 		m_count(DefaultWorkerThread), m_alloc() {
+
+}
+
+MyServer::MyServer(Configure *configure) : m_count(configure == NULL ? DefaultWorkerThread : configure->getThreadCnt()), m_alloc(){
 
 }
 
@@ -53,6 +57,7 @@ int32_t MyServer::handleTask(RawTask task){
 
 int32_t MyServer::handleTask(StoredProcedureTask task){
 
+	task.setTranId(TransIdGenerator::getId());
 	m_threadPools[rand()%m_count]->push(task);
 	return SUCCESS;
 }

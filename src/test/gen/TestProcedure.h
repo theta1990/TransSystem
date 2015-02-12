@@ -18,7 +18,7 @@
 namespace expdb {
 #define READTIMES 6
 #define WRITETIEMS 6
-#define RECORDSIZE 20
+#define RECORDSIZE 2000
 
 class AddProcedure : public StoredProcedure {
 public:
@@ -86,6 +86,8 @@ public:
 	//	std::vector<RowObj>::iterator it = objList.begin();
 		RowObj *it = objList;
 		RowObj *end = objList + size;
+		assert(it->getType() == MIDINT);
+		assert(it->getType() == MIDINT);
 		expr1.setArg(*it++);
 		expr2.setArg(*it++);
 		for (int i = 0; i < READTIMES && it != end && SUCCESS == ret ; ++i) {

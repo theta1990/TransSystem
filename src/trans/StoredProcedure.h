@@ -74,13 +74,19 @@ public:
 		}
 	}
 
-	int32_t getTranId() {
+	uint32_t getTranId() {
 
 		return m_tranId;
 	}
 
+	void setTranId (uint32_t id){
+
+		m_tranId = id;
+	}
+
 	int32_t destroy() {
 		free(m_objList);
+		m_objList = NULL;
 		return SUCCESS;
 	}
 
@@ -91,7 +97,7 @@ private:
 	RowObj *m_objList;
 	uint32_t m_size;
 	StoredProcedure *m_spRef;
-	int32_t m_tranId;
+	uint32_t m_tranId;
 	TaskContext *m_ctx;
 	Allocator *m_alloc;
 };

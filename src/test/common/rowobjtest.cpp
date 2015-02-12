@@ -58,6 +58,19 @@ int rowobjtest(int argc, char **argv) {
 	andd.dump();
 	printf("\n");
 
+	printf("%d\n",sizeof(RowObj));
+
+	RowObj *mr = (RowObj *)malloc(sizeof(RowObj));
+	mr[0] = dd;
+	mr->dump();
+	printf("\n");
+	dd.setBigInt(1);
+	mr->dump();
+
+	printf("\n");
+	mr->testSizeOf();
+	free(mr);
+
 	return 0;
 }
 //TEST(rowobjtest);

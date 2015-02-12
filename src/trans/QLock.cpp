@@ -47,7 +47,7 @@ int32_t expdb::QLock::lock() {
 	while( true ) {
 
 		if( 0 == atomic::atomic_compare_exchange(&m_lock, 1, 0) ){
-			m_owner = getpid();
+			m_owner = pthread_self();
 			break;
 		}else if( common::getCycleCount() - beginTime > m_TIMEOUT ){
 
