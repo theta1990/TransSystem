@@ -209,5 +209,5 @@ int hpCCSpTest(int arc, char **argv) {
 
 	return 0;
 }
-TEST(hpCCSpTest);
+//TEST(hpCCSpTest);
 

@@ -56,8 +56,12 @@ struct Equal<T*>
 
 
 template<typename KEY, typename VALUE>
+class TableIterator;
+
+template<typename KEY, typename VALUE>
 class HashIndex {
 
+public:
 	typedef Hash<KEY> HashFunc;
 	typedef Equal<KEY> EqualFunc;
 
@@ -65,6 +69,75 @@ class HashIndex {
 		KEY 	k;
 		VALUE 	v;
 		Hnode	*nxt;
+	};
+
+	/**
+	 * 这个类还不是线程安全的，在读取的过程中没有对hash桶加锁。
+	 * 果然迭代器做起来非常的困难。
+	 */
+	class TableIterator
+	{
+
+	public:
+		TableIterator(const HashIndex<KEY, VALUE> *mainTable) : m_idx(0), m_curNode(NULL), m_table(mainTable) {
+
+		}
+
+		int32_t open() {
+
+			int32_t ret = SUCCESS;
+
+			if( NULL == m_table ) ret = ERROR;
+
+			m_idx = 0;
+			m_curNode = NULL;
+
+			return ret;
+		}
+
+		int32_t next(VALUE &v) {
+
+			int32_t ret = SUCCESS;
+
+			if( NULL != m_curNode && NULL != m_curNode->nxt ) {
+
+				m_curNode = m_curNode->nxt;
+			}else {
+
+				m_curNode = NULL;
+				//find a non-null slot in the hash buckets array.
+				/**
+				 * 在这里加上对bucket的并发访问控制，保证能够顺利的获得下一个节点
+				 */
+				for(; m_idx < m_table->m_size && NULL == m_table->m_table[m_idx]; ++m_idx);
+
+				if( m_idx < m_table->m_size ) {
+					m_curNode = m_table->m_table[m_idx++];
+					m_curNode = m_curNode->nxt;
+				}
+			}
+
+			if( m_curNode == NULL ) {
+				ret = END;
+			}else {
+				v = m_curNode->v;
+			}
+			return ret;
+		}
+
+		int32_t close() {
+
+			m_curNode = NULL;
+			m_table = NULL;
+			m_idx = 0;
+			return SUCCESS;
+		}
+
+	private:
+
+		uint64_t 	m_idx;		//now visit
+		const Hnode *m_curNode;
+		const HashIndex<KEY, VALUE>	*m_table;
 	};
 
 public:
@@ -77,8 +150,15 @@ public:
 	int32_t find(const KEY &key, VALUE &value);
 	int32_t remove(const KEY &key);
 
+	TableIterator begin() const {
+
+		return TableIterator(this);
+	}
+
 	void destroy();
 
+
+	friend class TableIterator;
 private:
 	Hnode**		m_table;
 	BitLock 	m_bitLock;
@@ -86,6 +166,10 @@ private:
 	HashFunc 	m_hash_func;
 	EqualFunc 	m_equal_func;
 };
+
+/**
+ * Hash索引的迭代器，访问完整的hash表。
+ */
 
 
 template<typename KEY, typename VALUE>

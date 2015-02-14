@@ -49,10 +49,49 @@ class LockInfo;
 class RowTable {
 public:
 
-	class TableIterator{
+	class TableIterator {
+	public:
 
+		TableIterator(const RowTable *table) :
+				m_table(table), it(&(table->m_priIndex)) {
+
+		}
+
+		int32_t open() {
+
+			int32_t ret = it.open();
+			return ret;
+		}
+
+
+		/**
+		 * 在这里加上增加对行记录的锁定。
+		 */
+		int32_t next(Row &row) {
+
+			int32_t ret = SUCCESS;
+			RowValue *v;
+			ret = it.next(v);
+
+			if( SUCCESS == ret ) {
+				row.setDesc(m_table->m_desc);
+				int64_t pos = 0;
+				row.deserilization(v->m_value, m_table->m_desc->getRowLen(), pos);
+			}
+
+			return ret;
+		}
+
+		int32_t close() {
+
+			m_table = NULL;
+			return it.close();
+		}
+
+	private:
+		const RowTable *m_table;
+		HashIndex<RowKey, RowValue *>::TableIterator it;
 	};
-
 
 	RowTable();
 	virtual ~RowTable();
@@ -71,6 +110,11 @@ public:
 
 	int32_t get(const RowKey key, Row &ref);
 	int32_t get(TaskContext &ctx, const RowKey key, Row &ref);
+
+	TableIterator getTableIterator() const {
+
+		return TableIterator(this);
+	}
 
 private:
 

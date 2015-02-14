@@ -23,6 +23,7 @@ enum ExecType{
 	GET,
 	INDEXSCAN,
 	READOBJLIST,
+	SCAN
 };
 
 /***
